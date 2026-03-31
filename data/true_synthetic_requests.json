@@ -1,0 +1,902 @@
+[
+    {
+        "id": "req_001",
+        "document": "Automate the entry of patient intake form data directly into our Electronic Health Record (EHR) system to reduce manual input errors.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can help streamline that process quickly.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_002",
+        "document": "Scrape public health journal abstracts and medical news sites daily for mentions of specific emerging infectious diseases and report findings.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can help streamline that process quickly.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_003",
+        "document": "Generate weekly summary reports on hospital bed occupancy rates and department-specific patient flow from existing internal CSV files.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can help streamline that process quickly.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_004",
+        "document": "Automate the sending of personalized appointment reminders via SMS to patients scheduled for follow-up visits based on their EHR data.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can help streamline that process quickly.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_005",
+        "document": "Convert scanned medical faxes containing patient referrals and lab results into searchable digital text files for easier archiving and retrieval.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can help streamline that process quickly.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_006",
+        "document": "Extract specific key lab test results (e.g., A1C, cholesterol levels) from diverse PDF pathology reports and consolidate them for trending analysis.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can help streamline that process quickly.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_007",
+        "document": "Automate inventory tracking and reordering alerts for essential medical supplies based on barcode scans and predefined stock levels.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can help streamline that process quickly.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_008",
+        "document": "Integrate a real-time computer vision system into operating rooms to automatically identify and count surgical instruments, preventing retained foreign objects.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can integrate advanced AI solutions to enhance that capability.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_009",
+        "document": "Develop a Retrieval-Augmented Generation (RAG) pipeline to allow clinicians to query a vast repository of medical research papers and clinical guidelines for evidence-based answers.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can integrate advanced AI solutions to enhance that capability.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_010",
+        "document": "Connect disparate patient data streams from EHR, billing systems, lab results, and wearable devices into a unified, interactive dashboard via secure API integrations.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can integrate advanced AI solutions to enhance that capability.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_011",
+        "document": "Implement an AI-powered diagnostic assistant that integrates with imaging systems (e.g., MRI, CT scans) to flag potential abnormalities for radiologist review.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can integrate advanced AI solutions to enhance that capability.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_012",
+        "document": "Build an active database system that monitors patient medication lists for potential drug-drug interactions and flags adverse event reporting requirements in real-time.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can integrate advanced AI solutions to enhance that capability.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_013",
+        "document": "Create a personalized patient education portal that dynamically generates health information and recovery plans based on individual patient health records and conditions.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can integrate advanced AI solutions to enhance that capability.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_014",
+        "document": "Automate prior authorization submissions by integrating with various insurance company portals and extracting relevant clinical data from patient EHRs.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can integrate advanced AI solutions to enhance that capability.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_015",
+        "document": "Design an autonomous system capable of managing the entire hospital supply chain, predicting demand, optimizing procurement, and handling vendor relations without human intervention.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "We can deploy a transformational autonomous system to redefine that entire workflow.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_016",
+        "document": "Develop a self-improving AI that can autonomously manage and optimize clinical trial protocols, from patient recruitment and consent to data collection and analysis, adapting to real-time results.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "We can deploy a transformational autonomous system to redefine that entire workflow.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_017",
+        "document": "Implement an Artificial General Intelligence (AGI)-driven virtual physician capable of conducting patient consultations, diagnosing common ailments, and recommending personalized treatment plans autonomously.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "We can deploy a transformational autonomous system to redefine that entire workflow.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_018",
+        "document": "Create a fully autonomous system for continuous monitoring of hospital operational efficiency across all departments, identifying bottlenecks, and implementing self-correcting solutions in real-time.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "We can deploy a transformational autonomous system to redefine that entire workflow.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_019",
+        "document": "Deploy a self-optimizing system for drug discovery, autonomously designing novel chemical compounds, simulating their effects, and managing preclinical testing phases.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "We can deploy a transformational autonomous system to redefine that entire workflow.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_020",
+        "document": "Establish an AGI-powered system for comprehensive chronic disease management, autonomously adapting treatment plans, coordinating care providers, and proactively engaging patients based on continuous health data.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "We can deploy a transformational autonomous system to redefine that entire workflow.",
+            "domain": "Healthcare & Medicine"
+        }
+    },
+    {
+        "id": "req_021",
+        "document": "Automate data extraction from scanned delivery receipts and input into our Transportation Management System (TMS).",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Understood. We can implement a targeted script or basic automation to address this need efficiently.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_022",
+        "document": "Scrape competitor freight pricing and route availability from public logistics portals on a daily basis.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Understood. We can implement a targeted script or basic automation to address this need efficiently.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_023",
+        "document": "Generate automated daily reports on fleet fuel consumption and driver performance directly from telematics data.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Understood. We can implement a targeted script or basic automation to address this need efficiently.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_024",
+        "document": "Create a script to send automated low-stock alerts to the procurement department based on real-time inventory levels.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Understood. We can implement a targeted script or basic automation to address this need efficiently.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_025",
+        "document": "Automate the reconciliation of carrier invoices against our booked rates and service agreements.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Understood. We can implement a targeted script or basic automation to address this need efficiently.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_026",
+        "document": "Build a simple web scraper to collect real-time port congestion data from publicly available maritime websites.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Understood. We can implement a targeted script or basic automation to address this need efficiently.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_027",
+        "document": "Integrate IoT sensor data from refrigerated containers to trigger real-time temperature deviation alerts to our operations team.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "Understood. We can integrate advanced AI components like computer vision, real-time APIs, or RAG to enhance your operations.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_028",
+        "document": "Develop a RAG pipeline to provide instant, accurate answers to complex logistics compliance questions based on our internal regulatory documents.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "Understood. We can integrate advanced AI components like computer vision, real-time APIs, or RAG to enhance your operations.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_029",
+        "document": "Implement a computer vision system for automated package dimensioning and damage assessment on conveyor belts in our sortation facility.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "Understood. We can integrate advanced AI components like computer vision, real-time APIs, or RAG to enhance your operations.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_030",
+        "document": "Connect our ERP with various carrier APIs for real-time shipment status updates and automatic proof-of-delivery retrieval for all orders.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "Understood. We can integrate advanced AI components like computer vision, real-time APIs, or RAG to enhance your operations.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_031",
+        "document": "Construct a predictive model for demand forecasting based on historical sales, seasonal trends, and external economic indicators.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "Understood. We can integrate advanced AI components like computer vision, real-time APIs, or RAG to enhance your operations.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_032",
+        "document": "Create a dynamic database integration for real-time inventory visibility and synchronization across our distributed warehousing network.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "Understood. We can integrate advanced AI components like computer vision, real-time APIs, or RAG to enhance your operations.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_033",
+        "document": "Automate the process of finding and booking backhaul loads using third-party freight exchange APIs to minimize empty miles.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "Understood. We can integrate advanced AI components like computer vision, real-time APIs, or RAG to enhance your operations.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_034",
+        "document": "Deploy an AGI system to autonomously manage the entire warehouse operations, including picking, packing, dispatch scheduling, and labor optimization.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "Understood. We can design and deploy an autonomous, self-improving AGI system to revolutionize this entire workflow.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_035",
+        "document": "Implement a self-improving autonomous system for proactive supply chain risk mitigation, including dynamic rerouting, supplier diversification, and geopolitical event response.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "Understood. We can design and deploy an autonomous, self-improving AGI system to revolutionize this entire workflow.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_036",
+        "document": "Develop an AGI-driven platform for optimizing global multi-modal transportation networks, with self-learning capabilities for cost and efficiency.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "Understood. We can design and deploy an autonomous, self-improving AGI system to revolutionize this entire workflow.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_037",
+        "document": "Create an autonomous system for end-to-end international customs clearance, adapting to changing regulations and automating documentation.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "Understood. We can design and deploy an autonomous, self-improving AGI system to revolutionize this entire workflow.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_038",
+        "document": "Build an AGI agent to fully automate strategic fleet procurement, maintenance scheduling, and lifecycle management for our entire vehicle fleet.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "Understood. We can design and deploy an autonomous, self-improving AGI system to revolutionize this entire workflow.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_039",
+        "document": "Implement a self-optimizing system for dynamic pricing and capacity allocation within our freight brokerage division, learning from market fluctuations.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "Understood. We can design and deploy an autonomous, self-improving AGI system to revolutionize this entire workflow.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_040",
+        "document": "Deploy an autonomous system for continuous optimization of container stuffing and palletization strategies for international shipments, minimizing empty space.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "Understood. We can design and deploy an autonomous, self-improving AGI system to revolutionize this entire workflow.",
+            "domain": "Logistics & Supply Chain"
+        }
+    },
+    {
+        "id": "req_041",
+        "document": "Automate the extraction of transactional data from scanned PDF bank statements and input it directly into our accounting software.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Understood. We can implement a basic script or automation tool for this.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_042",
+        "document": "Develop a simple web scraper to collect real-time stock prices and trading volumes from a specified public financial news portal for our internal watchlist.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Understood. We can implement a basic script or automation tool for this.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_043",
+        "document": "Create a script to automatically generate daily portfolio performance reports based on CSV data exports from our trading platform.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Understood. We can implement a basic script or automation tool for this.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_044",
+        "document": "Implement an email automation system to send alerts to traders when specific stock price thresholds are met or breached.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Understood. We can implement a basic script or automation tool for this.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_045",
+        "document": "Convert a large archive of legacy financial data files from proprietary formats into a standardized SQL database schema.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Understood. We can implement a basic script or automation tool for this.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_046",
+        "document": "Automate the reconciliation process between two different spreadsheet reports detailing trading activities and client holdings.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Understood. We can implement a basic script or automation tool for this.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_047",
+        "document": "Extract key financial indicators like ticker symbols, closing prices, and trading volumes from daily market news articles and update a central spreadsheet.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Understood. We can implement a basic script or automation tool for this.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_048",
+        "document": "Integrate our proprietary high-frequency trading algorithm directly with multiple broker APIs for fully automated order execution and market access.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can definitely tackle this with a tailored API integration or a specialized AI model.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_049",
+        "document": "Develop a Retrieval-Augmented Generation (RAG) pipeline to allow financial analysts to query vast internal research documents and real-time market data for rapid insights.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can definitely tackle this with a tailored API integration or a specialized AI model.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_050",
+        "document": "Build a real-time sentiment analysis system that monitors social media, news feeds, and analyst reports specifically for a defined portfolio of stocks.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can definitely tackle this with a tailored API integration or a specialized AI model.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_051",
+        "document": "Implement a computer vision system to identify and alert on specific chart patterns (e.g., head and shoulders, double bottom) in real-time financial market data.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can definitely tackle this with a tailored API integration or a specialized AI model.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_052",
+        "document": "Create a predictive model for short-term stock price movements by combining historical price data with macroeconomic indicators and news sentiment.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can definitely tackle this with a tailored API integration or a specialized AI model.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_053",
+        "document": "Automate the generation of personalized financial advice summaries and portfolio recommendations for clients based on their risk profile and investment goals, utilizing a dynamic knowledge base.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can definitely tackle this with a tailored API integration or a specialized AI model.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_054",
+        "document": "Develop a system for automated compliance checks that cross-references all trading activities and client communications against evolving regulatory frameworks.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can definitely tackle this with a tailored API integration or a specialized AI model.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_055",
+        "document": "Design and deploy an autonomous hedge fund manager that continuously learns, adapts, and executes complex trading strategies across global markets without human intervention.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "This is an ambitious high-level AI challenge. Our advanced AGI solutions are designed for such transformative projects.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_056",
+        "document": "Develop a self-improving algorithmic trading system capable of identifying and exploiting novel, subtle arbitrage opportunities across multiple financial exchanges and asset classes.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "This is an ambitious high-level AI challenge. Our advanced AGI solutions are designed for such transformative projects.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_057",
+        "document": "Implement an AGI-driven platform to fully automate the entire client onboarding workflow for our wealth management firm, from initial lead generation to customized portfolio allocation.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "This is an ambitious high-level AI challenge. Our advanced AGI solutions are designed for such transformative projects.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_058",
+        "document": "Create an AI that can autonomously design and launch new financial products or derivatives tailored to identified market gaps and emerging client needs.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "This is an ambitious high-level AI challenge. Our advanced AGI solutions are designed for such transformative projects.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_059",
+        "document": "Build an AGI system to manage and optimize the entire risk exposure of a large financial institution in real-time, dynamically rebalancing positions across all asset classes and geographies.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "This is an ambitious high-level AI challenge. Our advanced AGI solutions are designed for such transformative projects.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_060",
+        "document": "Develop a fully autonomous system for forensic financial analysis, capable of identifying complex fraud patterns and insider trading activities undetectable by traditional methods.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "This is an ambitious high-level AI challenge. Our advanced AGI solutions are designed for such transformative projects.",
+            "domain": "Financial Tech & Trading"
+        }
+    },
+    {
+        "id": "req_061",
+        "document": "Automate the daily extraction of product review data from third-party websites and consolidate it into a weekly report.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Understood. We can implement a targeted web scraping script for that specific data extraction and reporting.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_062",
+        "document": "Develop a simple script to automatically update inventory counts on our e-commerce platform from our legacy warehouse management system's daily export file.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Certainly. A custom script can handle this data synchronization between your systems.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_063",
+        "document": "Set up a rule-based system to automatically send welcome emails to new subscribers and discount codes to customers who abandon their shopping carts.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can configure a series of basic automation rules and email triggers for these marketing workflows.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_064",
+        "document": "Create a spreadsheet automation to categorize incoming customer support emails based on keywords like \"refund,\" \"shipping,\" or \"product inquiry.\"",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "A simple scripting solution can be developed to automate the classification and organization of your support emails.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_065",
+        "document": "Build a script to monitor specific competitor product pages daily and alert us if their prices drop below a certain threshold.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "Yes, we can develop a targeted web scraping and alerting script for competitor price tracking.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_066",
+        "document": "Automate the generation of weekly sales performance reports by pulling data from our online store and POS system into a standardized template.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can set up an automation script to consolidate and format your sales data into standard reports.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_067",
+        "document": "Implement a basic bot that automatically responds to common FAQs on our social media pages using predefined answers.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "A rule-based bot can be deployed to handle common social media inquiries with templated responses.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_068",
+        "document": "Develop a real-time computer vision system for our physical store that identifies product stock levels on shelves and alerts staff to replenish them.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "Excellent. We can integrate a computer vision solution leveraging real-time image analysis for automated shelf stock monitoring.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_069",
+        "document": "Integrate a dynamic pricing engine that uses machine learning to adjust product prices in real-time based on demand, inventory, and competitor pricing via API.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We're ready to build a robust AI system to address this complex need by integrating a dynamic pricing model.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_070",
+        "document": "Implement an AI-powered chatbot with RAG capabilities to provide personalized customer support, accessing our entire product catalog and customer history database.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can develop an advanced RAG-based chatbot that deeply integrates with your data for highly effective customer service.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_071",
+        "document": "Create a personalized product recommendation engine for our e-commerce site that leverages user behavior, purchase history, and product attributes from an active database.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can integrate an AI-powered solution leveraging real-time user data and advanced models for highly personalized recommendations.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_072",
+        "document": "Deploy an AI system to analyze customer feedback from various sources (reviews, social media, support tickets) and identify emerging trends and product improvement opportunities.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can build an AI-driven text analytics platform to extract actionable insights from your diverse customer feedback channels.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_073",
+        "document": "Develop an intelligent fraud detection system that integrates with our payment gateway and uses machine learning to flag suspicious transactions in real-time.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We're ready to implement a robust machine learning system for real-time fraud detection integrated directly into your transaction flow.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_074",
+        "document": "Implement an AI-driven demand forecasting solution that predicts future sales for thousands of SKUs, integrating with our ERP and supply chain management systems.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "We can develop a sophisticated AI forecasting model that deeply integrates with your existing systems to optimize inventory and supply.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_075",
+        "document": "Design and deploy an AGI system to autonomously manage all aspects of our supply chain, from supplier negotiation and procurement to dynamic logistics optimization and inventory control.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "This is an ambitious vision. We can architect a transformative AGI solution to achieve complete autonomy across your entire supply chain.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_076",
+        "document": "Create a self-improving AI platform that autonomously designs, executes, and optimizes digital marketing campaigns across all channels, continuously learning and adapting to maximize ROI.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "We're equipped to deploy a self-evolving AI framework that will revolutionize your marketing, achieving autonomous campaign management and optimization.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_077",
+        "document": "Develop a fully autonomous physical retail store experience where AGI handles customer interaction, product stocking, security, and checkout without human intervention.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "We can design an AGI-driven ecosystem to power a fully autonomous physical retail environment, redefining the shopping experience.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_078",
+        "document": "Implement an AGI-powered system capable of analyzing market trends and customer feedback to autonomously design new apparel collections, generate manufacturing specifications, and predict sales.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "We are prepared to build an AGI solution that can autonomously innovate and manage your product design and development lifecycle.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_079",
+        "document": "Architect an enterprise-wide AGI assistant that acts as a virtual COO, overseeing and optimizing all business operations, identifying efficiencies, and making strategic decisions across departments.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "This truly redefines operations. We can develop an AGI-powered virtual COO to autonomously manage and optimize your entire enterprise.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_080",
+        "document": "Deploy an AGI-driven robotic workforce for our warehouse that autonomously manages receiving, picking, packing, and shipping processes, including self-diagnosis and maintenance.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "We can integrate an AGI system to orchestrate a fully autonomous robotic workforce, transforming your warehouse operations.",
+            "domain": "Retail & E-commerce"
+        }
+    },
+    {
+        "id": "req_081",
+        "document": "Automate the extraction of key data points from supplier invoices and input them directly into our existing ERP system to reduce manual data entry errors.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can certainly assist with that. Our low-level integration services are perfect for automating routine tasks and improving data flow.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_082",
+        "document": "Develop a simple script to generate daily production summary reports by consolidating data from multiple PLC logs and presenting it in a standardized format.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can certainly assist with that. Our low-level integration services are perfect for automating routine tasks and improving data flow.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_083",
+        "document": "Implement a web scraping bot to collect real-time pricing data for specific building materials from various online vendor websites for competitive analysis.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can certainly assist with that. Our low-level integration services are perfect for automating routine tasks and improving data flow.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_084",
+        "document": "Set up an automated email notification system that alerts maintenance teams when critical manufacturing equipment sensor readings exceed predefined operational thresholds.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can certainly assist with that. Our low-level integration services are perfect for automating routine tasks and improving data flow.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_085",
+        "document": "Create a utility to automatically categorize, tag, and archive new engineering drawings and blueprints into our digital document management system based on metadata.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can certainly assist with that. Our low-level integration services are perfect for automating routine tasks and improving data flow.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_086",
+        "document": "Build a simple optical character recognition (OCR) tool to convert handwritten construction site safety inspection checklists into structured digital spreadsheet data.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can certainly assist with that. Our low-level integration services are perfect for automating routine tasks and improving data flow.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_087",
+        "document": "Implement a scripting solution to automatically update inventory levels in our warehouse management system upon scanning new material deliveries, ensuring accurate stock counts.",
+        "metadata": {
+            "integration_level": "low",
+            "avatar_response": "We can certainly assist with that. Our low-level integration services are perfect for automating routine tasks and improving data flow.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_088",
+        "document": "Deploy a real-time computer vision system on our assembly line to detect surface defects and anomalies on manufactured components, flagging them for immediate inspection.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "This is well within our expertise. Our mid-level integration solutions offer robust AI capabilities for real-time analysis and enhanced operational efficiency.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_089",
+        "document": "Integrate our existing CAD software with a Retrieval-Augmented Generation (RAG) pipeline to provide engineers with instant, context-aware access to design standards and material specifications.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "This is well within our expertise. Our mid-level integration solutions offer robust AI capabilities for real-time analysis and enhanced operational efficiency.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_090",
+        "document": "Develop an API integration solution to synchronize project updates and task statuses between our construction project management software and our client communication platform.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "This is well within our expertise. Our mid-level integration solutions offer robust AI capabilities for real-time analysis and enhanced operational efficiency.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_091",
+        "document": "Implement a predictive maintenance system utilizing machine learning models on sensor data from heavy construction machinery to forecast potential equipment failures before they occur.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "This is well within our expertise. Our mid-level integration solutions offer robust AI capabilities for real-time analysis and enhanced operational efficiency.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_092",
+        "document": "Create a real-time analytics dashboard that monitors construction site progress, comparing drone imagery with BIM models to identify discrepancies and track milestones.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "This is well within our expertise. Our mid-level integration solutions offer robust AI capabilities for real-time analysis and enhanced operational efficiency.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_093",
+        "document": "Build a Natural Language Processing (NLP) system capable of automatically extracting key clauses, obligations, and potential risks from complex construction contracts.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "This is well within our expertise. Our mid-level integration solutions offer robust AI capabilities for real-time analysis and enhanced operational efficiency.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_094",
+        "document": "Establish an active database system that dynamically optimizes material procurement schedules based on real-time supply chain fluctuations, inventory levels, and project timeline demands.",
+        "metadata": {
+            "integration_level": "mid",
+            "avatar_response": "This is well within our expertise. Our mid-level integration solutions offer robust AI capabilities for real-time analysis and enhanced operational efficiency.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_095",
+        "document": "Design and implement a fully autonomous quality control system for our manufacturing plant that uses AI to inspect, identify, and self-correct product defects without human intervention.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "An exciting challenge! Our high-level AI integration focuses on transforming entire workflows with advanced autonomous systems and cutting-edge intelligence.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_096",
+        "document": "Develop a self-improving robotic welding system that utilizes advanced AI to learn and adapt optimal welding paths and parameters for various materials and complex geometries.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "An exciting challenge! Our high-level AI integration focuses on transforming entire workflows with advanced autonomous systems and cutting-edge intelligence.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_097",
+        "document": "Create an Artificial General Intelligence (AGI) assistant capable of autonomously managing an entire construction project lifecycle, from initial bidding and resource allocation to risk mitigation and final delivery.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "An exciting challenge! Our high-level AI integration focuses on transforming entire workflows with advanced autonomous systems and cutting-edge intelligence.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_098",
+        "document": "Implement a fully autonomous supply chain management system for construction materials that can anticipate demand, manage logistics end-to-end, and negotiate with suppliers without human oversight.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "An exciting challenge! Our high-level AI integration focuses on transforming entire workflows with advanced autonomous systems and cutting-edge intelligence.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_099",
+        "document": "Develop an AI system that can dynamically redesign building components in real-time based on fluctuating structural integrity requirements, material availability, and evolving cost constraints.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "An exciting challenge! Our high-level AI integration focuses on transforming entire workflows with advanced autonomous systems and cutting-edge intelligence.",
+            "domain": "Manufacturing & Construction"
+        }
+    },
+    {
+        "id": "req_100",
+        "document": "Deploy an AI-driven system to autonomously manage and optimize energy consumption across an entire factory floor, adapting in real-time to production schedules, machine loads, and external environmental factors.",
+        "metadata": {
+            "integration_level": "high",
+            "avatar_response": "An exciting challenge! Our high-level AI integration focuses on transforming entire workflows with advanced autonomous systems and cutting-edge intelligence.",
+            "domain": "Manufacturing & Construction"
+        }
+    }
+]
