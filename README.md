@@ -7,5 +7,7 @@ Step 2: Activate the virtual environment
 source venv/Scripts/activate
 Step 3: Install dependencies
 pip install -r requirements.txt
+Step 4: Add GEMINI API KEY
+Create a .env file and write GEMINI_API_KEY='your-api-key'
 Step 4: Run the application
 python src/main.py
