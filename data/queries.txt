@@ -1,0 +1,7 @@
+What kind of agent should I use for emails?
+I want to use computer vision to check if my construction workers are wearing the appropriate PPE.
+How do I create an agent to automate my hospital's record-keeping?
+I am a manufacturing company, and my employees, at the end of every working day, will make their rounds around the factory to look for defects and if they find any, they will take a picture of it and send to their supervisor. However, they tend to take pictures of the same defects. I want to make an app that can accept all their pictures and then use your AI to identify the duplicate defects. How much might that cost?
+I want to track my hospital's medical supplies and use AI to automate it and prompt my staff whenever an issue arises.
+I want to learn how to swim and become an olympic athlete at swimming.
+How do I know if i am pregnant?
