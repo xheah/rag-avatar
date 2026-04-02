@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agency Avatar</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Using Google Fonts for a modern tech feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Visualization Panel -->
+        <div class="visualizer-container">
+            <div class="orb"></div>
+            <p class="status-text">Status: <span id="status">Online</span></p>
+        </div>
+
+        <!-- Chat Panel -->
+        <div class="chat-container">
+            <div class="chat-history" id="chat-history">
+                <div class="message avatar">
+                    <div class="message-content">Hello there! I am your AI Agency Avatar. How can I assist you with your integration projects today?</div>
+                </div>
+            </div>
+            
+            <div class="input-area">
+                <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off">
+                <button id="send-btn">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+                <button id="mic-btn" class="mic-inactive" title="Audio Coming Soon in Phase 2!">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                    </svg>
+                </button>
+            </div>
+            <div id="thought-box" class="thought-box hidden"></div>
+        </div>
+    </div>
+    <script src="/static/app.js"></script>
+</body>
+</html>

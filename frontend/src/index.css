@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+
+@theme {
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-fast: pulse-fast 1s ease-in-out infinite;
+  --animate-wave: wave 1.5s ease-in-out infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1) }
+    50% { transform: translateY(-20px) scale(1.05) }
+  }
+
+  @keyframes pulse-fast {
+    0%, 100% { transform: scale(1); opacity: 0.8 }
+    50% { transform: scale(1.1); opacity: 1 }
+  }
+
+  @keyframes wave {
+    0% { border-radius: 50%; transform: rotate(0deg) }
+    25% { border-radius: 45% 55% 45% 55%; transform: rotate(90deg) }
+    50% { border-radius: 50%; transform: rotate(180deg) }
+    75% { border-radius: 55% 45% 55% 45%; transform: rotate(270deg) }
+    100% { border-radius: 50%; transform: rotate(360deg) }
+  }
+}
+
+@layer base {
+  body {
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+@utility custom-scrollbar {
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+}
+
+@utility scrollbar-hide {
+  &::-webkit-scrollbar { display: none; }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

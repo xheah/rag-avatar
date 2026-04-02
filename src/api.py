@@ -1,0 +1,144 @@
+from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
+import json
+from fastapi.responses import HTMLResponse, StreamingResponse
+from pydantic import BaseModel
+from typing import Dict
+import sys
+import os
+
+# Ensure src is importable
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.config import get_embedding_model
+from src.vectorstore.retriever import get_closest_matches
+from src.vectorstore.database_creation import initialize_database
+from src.llm.prompts import (
+    adaptive_router, generate_chat_response, generate_rag_response_v4, rewrite_query,
+    generate_chat_response_stream, generate_rag_response_v4_stream
+)
+
+app = FastAPI(title="RAG Avatar API")
+
+# Mount Static Files
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+static_dir = os.path.join(BASE_DIR, "static")
+if not os.path.exists(static_dir):
+    os.makedirs(static_dir)
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+# We will store chat history per session
+sessions: Dict[str, str] = {}
+
+class ChatRequest(BaseModel):
+    message: str
+    session_id: str = "default_session"
+
+@app.on_event("startup")
+async def startup_event():
+    print("==================================================")
+    print("FastAPI Backend Initializing")
+    print("Verifying database and model structures...")
+    initialize_database()
+    print("Warming up embedding model (this may take a second)...")
+    get_embedding_model() # Trigger the lazy load here
+    print("System Ready!")
+    print("==================================================\n")
+
+@app.get("/", response_class=HTMLResponse)
+async def get_index():
+    with open(os.path.join(BASE_DIR, "static", "index.html"), "r") as f:
+        return f.read()
+
+async def chat_stream_generator(user_query: str, session_id: str):
+    if session_id not in sessions:
+        sessions[session_id] = ""
+    chat_history = sessions[session_id]
+    
+    try:
+        route = adaptive_router(chat_history=chat_history, latest_user_query=user_query)
+        yield f"data: {json.dumps({'type': 'route', 'route': route})}\n\n"
+        
+        full_response = ""
+        
+        if route == "CHAT":
+            for chunk in generate_chat_response_stream(user_query=user_query, chat_history=chat_history):
+                full_response += chunk
+                yield f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n"
+        else: # RAG
+            new_prompt = rewrite_query(chat_history=chat_history, latest_user_query=user_query)
+            try:
+                retrieved = get_closest_matches(user_query=new_prompt, k=3)
+            except Exception as re:
+                print(f"Retriever Error: {re}")
+                retrieved = []
+            
+            for chunk in generate_rag_response_v4_stream(user_query=new_prompt, retrieved_documents=retrieved, chat_history=chat_history):
+                full_response += chunk
+                yield f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n"
+                
+        # Handle parsed final answer saving
+        import re
+        speech_match = re.search(r"<speech>(.*?)</speech>", full_response, re.DOTALL | re.IGNORECASE)
+        final_answer = speech_match.group(1).strip() if speech_match else full_response
+        sessions[session_id] += f"User: {user_query}\nAvatar: {final_answer}\n"
+        
+        yield f"data: {json.dumps({'type': 'done'})}\n\n"
+        
+    except Exception as e:
+        yield f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n"
+
+@app.post("/api/chat_stream")
+async def chat_endpoint_stream(req: ChatRequest):
+    return StreamingResponse(
+        chat_stream_generator(req.message, req.session_id),
+        media_type="text/event-stream"
+    )
+
+@app.post("/api/chat")
+async def chat_endpoint(req: ChatRequest):
+    user_query = req.message
+    session_id = req.session_id
+    
+    # Initialize history if not exists
+    if session_id not in sessions:
+        sessions[session_id] = ""
+        
+    chat_history = sessions[session_id]
+    
+    try:
+        # Step 1: Routing
+        route = adaptive_router(chat_history=chat_history, latest_user_query=user_query)
+        
+        if route == "CHAT":
+            response = generate_chat_response(user_query=user_query, chat_history=chat_history)
+            thoughts = "No thoughts needed for casual chat."
+        else: # RAG
+            new_prompt = rewrite_query(chat_history=chat_history, latest_user_query=user_query)
+            # Try/Except around Retriever
+            try:
+                retrieved = get_closest_matches(user_query=new_prompt, k=3)
+            except Exception as re:
+                print(f"Retriever Error: {re}")
+                retrieved = []
+            
+            # Generator
+            response, thoughts = generate_rag_response_v4(user_query=new_prompt, retrieved_documents=retrieved, chat_history=chat_history)
+            
+        sessions[session_id] += f"User: {user_query}\nAvatar: {response}\n"
+        
+        return {
+            "response": response,
+            "thoughts": thoughts,
+            "route": route
+        }
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
+
+@app.post("/api/clear")
+async def clear_session(req: ChatRequest):
+    session_id = req.session_id
+    sessions[session_id] = ""
+    return {"status": "cleared"}
