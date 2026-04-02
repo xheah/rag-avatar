@@ -4,26 +4,45 @@ import json
 
 # Ensure that 'src' is importable if run directly
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.config import get_db_client
+from src.config import get_db_client, get_embedding_model
 
-client = get_db_client()
+def initialize_database():
+    """Checks if the active vector database is populated. If not, it populates it."""
+    client = get_db_client()
+    collection = client.get_or_create_collection(name="collection_minilm_finetuned")
 
-collection = client.get_or_create_collection(name="client_requests")
+    # Check if the database has items in it
+    if collection.count() > 0:
+        print(f"Database 'collection_minilm_finetuned' already populated with {collection.count()} item(s).")
+        return
 
-data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data", "true_synthetic_requests.json")
-with open(data_path, "r") as f:
-    data = json.load(f)
+    print("Database is empty! Reading json source and generating embeddings... This may take a minute.")
 
-# Extract lists for ChromaDB ingestion
-documents = [item["document"] for item in data]
-metadatas = [item["metadata"] for item in data]
-ids = [item["id"] for item in data]
+    # Get data
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    data_path = os.path.join(base_dir, "data", "true_synthetic_requests.json")
+    
+    with open(data_path, "r") as f:
+        data = json.load(f)
 
-# Inject all 100 items
-collection.upsert(
-    documents=documents,
-    metadatas=metadatas,
-    ids=ids
-)
+    # Extract lists for ChromaDB ingestion
+    documents = [item["document"] for item in data]
+    metadatas = [item["metadata"] for item in data]
+    ids = [item["id"] for item in data]
 
-print(f"Successfully injected {len(documents)} requests into the vector database.")
+    # Initialize the model and generate embeddings
+    model = get_embedding_model()
+    embeddings = model.encode(documents, normalize_embeddings=True).tolist()
+
+    # Inject all items into the blank DB
+    collection.upsert(
+        documents=documents,
+        metadatas=metadatas,
+        ids=ids,
+        embeddings=embeddings
+    )
+
+    print(f"Successfully generated embeddings and injected {len(documents)} requests into the root vector database.")
+
+if __name__ == "__main__":
+    initialize_database()
