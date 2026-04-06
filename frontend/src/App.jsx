@@ -23,6 +23,21 @@ function App() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const interruptAudio = () => {
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        try {
+            audioContextRef.current.close();
+        } catch(e) {
+            console.error("Audio stop error", e);
+        }
+    }
+    audioContextRef.current = null;
+    nextStartTimeRef.current = 0;
+    if (orbState === 'speaking') {
+        setOrbState('idle'); 
+    }
+  };
+
   const stopListening = () => {
     setIsListening(false);
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
@@ -177,7 +192,11 @@ function App() {
   };
 
   const toggleListen = () => {
-      if (orbState !== 'idle') return;
+      if (orbState !== 'idle') {
+          interruptAudio();
+          startListening();
+          return;
+      }
       if (isListening) stopListening();
       else startListening();
   };
@@ -469,10 +488,9 @@ function App() {
 
             <button     
               onClick={toggleListen}
-              disabled={orbState !== 'idle'}
               className={`p-2.5 rounded-full transition-colors mr-1 
-                ${orbState !== 'idle' ? 'text-slate-500 cursor-not-allowed' : 
-                  isListening ? 'text-rose-500 bg-rose-500/20 animate-pulse' : 'text-indigo-400 hover:text-white hover:bg-indigo-500/20'}`}
+                ${isListening ? 'text-rose-500 bg-rose-500/20 animate-pulse' : 
+                  orbState !== 'idle' ? 'text-indigo-400 hover:text-white hover:bg-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.5)]' : 'text-indigo-400 hover:text-white hover:bg-indigo-500/20'}`}
               title="Voice Chat"
             >
               <Mic size={18} />
