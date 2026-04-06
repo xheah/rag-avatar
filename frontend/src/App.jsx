@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Mic, Trash2, Loader2, BrainCircuit } from 'lucide-react';
+import { Send, Mic, Trash2, Loader2, BrainCircuit, Upload } from 'lucide-react';
 
 function App() {
   const [messages, setMessages] = useState([
@@ -7,30 +7,199 @@ function App() {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [orbState, setOrbState] = useState('idle'); // idle, thinking, speaking
+  
+  // Voice State
+  const [isListening, setIsListening] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const sttSocketRef = useRef(null);
+  const transcriptRef = useRef('');
+  const fileInputRef = useRef(null);
+  
   const chatEndRef = useRef(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!inputValue.trim() || orbState !== 'idle') return;
+  const stopListening = () => {
+    setIsListening(false);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());
+    }
+    if (sttSocketRef.current && sttSocketRef.current.readyState === WebSocket.OPEN) {
+      sttSocketRef.current.close();
+    }
+  };
 
-    const userMessage = inputValue.trim();
-    setMessages(prev => [...prev, { role: 'user', content: userMessage, thoughts: null }]);
+  const startListening = async () => {
+    try {
+      transcriptRef.current = '';
+      setInputValue('');
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      mediaRecorderRef.current = mediaRecorder;
+
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${wsProtocol}//${window.location.host}/api/stt`;
+      const socket = new WebSocket(wsUrl);
+      sttSocketRef.current = socket;
+
+      socket.onopen = () => {
+        setIsListening(true);
+        mediaRecorder.addEventListener('dataavailable', event => {
+          if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) {
+            socket.send(event.data);
+          }
+        });
+        mediaRecorder.start(250); // Send raw WebM chunks to Deepgram every 250ms
+      };
+
+      socket.onmessage = (event) => {
+        const received = JSON.parse(event.data);
+        if (received.type === 'Results' && received.channel?.alternatives?.[0]) {
+            const transcript = received.channel.alternatives[0].transcript;
+            
+            if (transcript) {
+                if (received.is_final) {
+                    transcriptRef.current += (transcriptRef.current ? ' ' : '') + transcript;
+                    setInputValue(transcriptRef.current);
+                } else {
+                    setInputValue(transcriptRef.current + (transcriptRef.current ? ' ' : '') + transcript);
+                }
+            }
+
+            if (received.speech_final) {
+                const finalStr = transcriptRef.current.trim();
+                if (finalStr.length > 0) {
+                    stopListening();
+                    handleSend(finalStr);
+                }
+            }
+        }
+      };
+
+      socket.onerror = (e) => {
+          console.error("STT WebSocket Error:", e);
+          stopListening();
+      };
+      
+    } catch (err) {
+      console.error("Error accessing microphone", err);
+      alert("Microphone access denied or unavailable.");
+      stopListening();
+    }
+  };
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    try {
+      transcriptRef.current = '';
+      setInputValue('');
+      setIsListening(true);
+      
+      const audioUrl = URL.createObjectURL(file);
+      const audioEl = new Audio(audioUrl);
+      audioEl.muted = true; // Play silently
+      await audioEl.play();
+
+      // Capture stream from playing audio
+      const stream = audioEl.captureStream ? audioEl.captureStream() : audioEl.mozCaptureStream();
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      mediaRecorderRef.current = mediaRecorder;
+
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${wsProtocol}//${window.location.host}/api/stt`;
+      const socket = new WebSocket(wsUrl);
+      sttSocketRef.current = socket;
+
+      socket.onopen = () => {
+        mediaRecorder.addEventListener('dataavailable', e => {
+          if (e.data.size > 0 && socket.readyState === WebSocket.OPEN) {
+            socket.send(e.data);
+          }
+        });
+        mediaRecorder.start(250); 
+      };
+
+      audioEl.onended = () => {
+         // File playback finished. Give Deepgram 500ms to return final words, 
+         // then force a send because the stream won't have trailing silence to trigger speech_final naturally.
+         setTimeout(() => {
+             const finalStr = transcriptRef.current.trim();
+             stopListening();
+             if (finalStr.length > 0) {
+                 handleSend(finalStr);
+             }
+         }, 500);
+      };
+
+      socket.onmessage = (event) => {
+        const received = JSON.parse(event.data);
+        if (received.type === 'Results' && received.channel?.alternatives?.[0]) {
+            const transcript = received.channel.alternatives[0].transcript;
+            
+            if (transcript) {
+                if (received.is_final) {
+                    transcriptRef.current += (transcriptRef.current ? ' ' : '') + transcript;
+                    setInputValue(transcriptRef.current);
+                } else {
+                    setInputValue(transcriptRef.current + (transcriptRef.current ? ' ' : '') + transcript);
+                }
+            }
+
+            if (received.speech_final) {
+                const finalStr = transcriptRef.current.trim();
+                if (finalStr.length > 0) {
+                    stopListening();
+                    handleSend(finalStr);
+                }
+            }
+        }
+      };
+
+      socket.onerror = (e) => {
+          console.error("STT WebSocket Error:", e);
+          stopListening();
+      };
+      
+    } catch (err) {
+      console.error("Error with file test:", err);
+      alert("Failed to inject audio file.");
+      stopListening();
+    }
+    // clear input
+    event.target.value = null;
+  };
+
+  const toggleListen = () => {
+      if (orbState !== 'idle') return;
+      if (isListening) stopListening();
+      else startListening();
+  };
+
+  const handleSend = async (autoMessage = null) => {
+    const textToSend = typeof autoMessage === 'string' ? autoMessage : inputValue.trim();
+    if (!textToSend || orbState !== 'idle') return;
+
+    if (isListening) stopListening();
+
+    setMessages(prev => [...prev, { role: 'user', content: textToSend, thoughts: null }]);
     setInputValue('');
+    transcriptRef.current = '';
     setOrbState('thinking');
 
     try {
       const response = await fetch('/api/chat_stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage, session_id: "react_user" })
+        body: JSON.stringify({ message: textToSend, session_id: "react_user" })
       });
 
       if (!response.ok) throw new Error("Failed to connect");
 
-      // Setup initial empty avatar message to be filled
       let msgIndex = null;
       setMessages(prev => {
         msgIndex = prev.length;
@@ -72,7 +241,6 @@ function App() {
                 if (thoughtMatch && thoughtMatch[1].trim().length > 0) {
                     parsedThoughts = thoughtMatch[1].trim();
                 } else if (currentRaw.includes('<thought>') && !currentRaw.includes('<speech>')) {
-                    // It opened <thought> but hasn't written anything inside yet
                     parsedThoughts = "";
                 }
 
@@ -80,7 +248,6 @@ function App() {
                   setOrbState('speaking');
                   parsedContent = speechMatch[1].trim();
                 } else if (!currentRaw.includes('<speech>') && !currentRaw.includes('<thought>') && currentRaw.length > 20) {
-                  // Fallback: Gemini forgot tags entirely, assume it's speaking
                   setOrbState('speaking');
                   parsedContent = currentRaw;
                 } else {
@@ -127,7 +294,7 @@ function App() {
 
   const handleClear = async () => {
     try {
-      if (orbState !== 'idle') return; // Protect clear feature while streaming
+      if (orbState !== 'idle') return;
       await fetch('/api/clear', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -162,7 +329,7 @@ function App() {
               ${orbState === 'thinking' ? 'text-rose-400' : ''}
               ${orbState === 'speaking' ? 'text-emerald-400' : ''}
             `}>
-              {orbState === 'idle' && 'Online'}
+              {orbState === 'idle' && (isListening ? 'Listening...' : 'Online')}
               {orbState === 'thinking' && 'Analyzing...'}
               {orbState === 'speaking' && 'Speaking...'}
             </span>
@@ -175,8 +342,8 @@ function App() {
           <div className="flex justify-end mb-4">
             <button 
               onClick={handleClear}
-              disabled={orbState !== 'idle'}
-              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-full transition-colors ${orbState === 'idle' ? 'text-rose-300 hover:text-white hover:bg-rose-500/20' : 'text-slate-500 cursor-not-allowed'}`}
+              disabled={orbState !== 'idle' || isListening}
+              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-full transition-colors ${orbState === 'idle' && !isListening ? 'text-rose-300 hover:text-white hover:bg-rose-500/20' : 'text-slate-500 cursor-not-allowed'}`}
             >
               <Trash2 size={14} /> Clear Chat
             </button>
@@ -186,7 +353,7 @@ function App() {
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex max-w-[85%] flex-col gap-2 ${msg.role === 'user' ? 'self-end' : 'self-start'}`}>
                 
-                {/* Thinking UI (Above Avatar Message) */}
+                {/* Thinking UI */}
                 {msg.thoughts !== null && (
                   <div className="text-sm font-mono bg-black/40 border border-white/5 p-4 rounded-2xl text-slate-300 w-full shadow-inner flex flex-col gap-3">
                     <div className="flex items-center gap-2 text-indigo-400 font-bold uppercase tracking-wider text-xs">
@@ -199,7 +366,7 @@ function App() {
                   </div>
                 )}
 
-                {/* Main Speech UI */}
+                {/* Speech UI */}
                 {(!msg.thoughts || msg.content) && (
                   <div className={`
                       p-4 rounded-2xl shadow-lg leading-relaxed text-[15px]
@@ -219,7 +386,7 @@ function App() {
             <input 
               type="text" 
               className="flex-1 bg-transparent border-none outline-none text-white placeholder-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
-              placeholder="Type your message..."
+              placeholder={isListening ? "Listening..." : "Type your message..."}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -227,17 +394,37 @@ function App() {
             />
             
             <button 
-              onClick={handleSend}
-              disabled={orbState !== 'idle'}
-              className={`p-2.5 rounded-full transition-colors ${orbState === 'idle' ? 'text-indigo-400 hover:text-white hover:bg-indigo-500/20' : 'text-slate-500 cursor-not-allowed'}`}
+              onClick={() => handleSend()}
+              disabled={orbState !== 'idle' || isListening}
+              className={`p-2.5 rounded-full transition-colors ${orbState === 'idle' && !isListening ? 'text-indigo-400 hover:text-white hover:bg-indigo-500/20' : 'text-slate-500 cursor-not-allowed'}`}
             >
               <Send size={18} />
             </button>
+            
+            <input
+              type="file"
+              accept="audio/*"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+            />
             <button     
-              onClick={() => {if(orbState === 'idle') alert("Audio functionality coming in Phase 2!")}}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={orbState !== 'idle' || isListening}
+              className={`p-2.5 rounded-full transition-colors mr-1 
+                ${orbState !== 'idle' ? 'text-slate-500 cursor-not-allowed' : 'text-slate-400 hover:text-white hover:bg-slate-500/20'}`}
+              title="Upload Audio File (Library Mode)"
+            >
+              <Upload size={18} />
+            </button>
+
+            <button     
+              onClick={toggleListen}
               disabled={orbState !== 'idle'}
-              className={`p-2.5 rounded-full transition-colors mr-1 ${orbState === 'idle' ? 'text-rose-400 hover:text-white hover:bg-rose-500/20' : 'text-slate-500 cursor-not-allowed'}`}
-              title="Coming in Phase 2!"
+              className={`p-2.5 rounded-full transition-colors mr-1 
+                ${orbState !== 'idle' ? 'text-slate-500 cursor-not-allowed' : 
+                  isListening ? 'text-rose-500 bg-rose-500/20 animate-pulse' : 'text-indigo-400 hover:text-white hover:bg-indigo-500/20'}`}
+              title="Voice Chat"
             >
               <Mic size={18} />
             </button>

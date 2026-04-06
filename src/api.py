@@ -1,11 +1,13 @@
-from fastapi import FastAPI, Request
-from fastapi.staticfiles import StaticFiles
+import sys
+import os
 import json
+import asyncio
+import websockets
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, StreamingResponse
 from pydantic import BaseModel
 from typing import Dict
-import sys
-import os
 
 # Ensure src is importable
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -87,6 +89,63 @@ async def chat_stream_generator(user_query: str, session_id: str):
         
     except Exception as e:
         yield f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n"
+
+@app.websocket("/api/stt")
+async def stt_websocket(websocket: WebSocket):
+    await websocket.accept()
+    # endpointing=500 means if the user pauses for 500ms, Deepgram sends a "speech_final" event!
+    # smart_format applies punctuation and capitalization automatically
+    DEEPGRAM_URL = 'wss://api.deepgram.com/v1/listen?smart_format=true&interim_results=true&endpointing=500'
+    api_key = os.getenv("DEEPGRAM_API_KEY")
+    
+    if not api_key:
+        print("Missing DEEPGRAM_API_KEY")
+        await websocket.close(code=1011)
+        return
+
+    try:
+        async with websockets.connect(
+            DEEPGRAM_URL, 
+            additional_headers={"Authorization": f"Token {api_key}"}
+        ) as dg_socket:
+            
+            async def receiver():
+                """Receives transcripts from Deepgram and forwards to React frontend"""
+                try:
+                    while True:
+                        result = await dg_socket.recv()
+                        await websocket.send_text(result)
+                except websockets.exceptions.ConnectionClosed:
+                    pass
+                except Exception as e:
+                    print(f"Deepgram STT Receive Error: {e}")
+
+            async def sender():
+                """Receives raw WebM audio chunks from React and pipes to Deepgram"""
+                try:
+                    while True:
+                        data = await websocket.receive_bytes()
+                        await dg_socket.send(data)
+                except WebSocketDisconnect:
+                    pass
+                except Exception as e:
+                    print(f"Deepgram STT Send Error: {e}")
+
+            # Run both concurrently
+            done, pending = await asyncio.wait(
+                [asyncio.create_task(receiver()), asyncio.create_task(sender())],
+                return_when=asyncio.FIRST_COMPLETED
+            )
+            # Cancel the remaining task when one finishes
+            for task in pending:
+                task.cancel()
+    except Exception as e:
+        print(f"Deepgram WebSocket Error: {e}")
+    finally:
+        try:
+            await websocket.close()
+        except:
+            pass
 
 @app.post("/api/chat_stream")
 async def chat_endpoint_stream(req: ChatRequest):
