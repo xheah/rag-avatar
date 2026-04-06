@@ -14,6 +14,8 @@ function App() {
   const sttSocketRef = useRef(null);
   const transcriptRef = useRef('');
   const fileInputRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const nextStartTimeRef = useRef(0);
   
   const chatEndRef = useRef(null);
 
@@ -212,19 +214,34 @@ function App() {
       let currentRaw = "";
       let route = "CHAT";
       let isDone = false;
+      let eventBuffer = "";
+      
+      let audioCtx = audioContextRef.current;
+      if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 44100 });
+          audioContextRef.current = audioCtx;
+      }
+      if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+      }
+      nextStartTimeRef.current = audioCtx.currentTime;
 
       while (!isDone) {
         const { value, done } = await reader.read();
         if (done) break;
         
-        const chunkString = decoder.decode(value, { stream: true });
-        const events = chunkString.split('\n\n');
+        eventBuffer += decoder.decode(value, { stream: true });
+        const events = eventBuffer.split('\n\n');
+        // Pop the last element off to keep it in the buffer (it's either empty or a partial event)
+        eventBuffer = events.pop();
         
         for (const event of events) {
           if (!event.startsWith('data: ')) continue;
           
           try {
-            const payload = JSON.parse(event.substring(6));
+            const payloadStr = event.substring(6).trim();
+            if (payloadStr === '[DONE]') continue;
+            const payload = JSON.parse(payloadStr);
             
             if (payload.type === 'route') {
               route = payload.route;
@@ -264,6 +281,29 @@ function App() {
                 return newArray;
               });
 
+            } else if (payload.type === 'audio_chunk') {
+                try {
+                    const b64Data = payload.content;
+                    const binaryStr = atob(b64Data);
+                    const bytes = new Uint8Array(binaryStr.length);
+                    for (let i = 0; i < binaryStr.length; i++) {
+                        bytes[i] = binaryStr.charCodeAt(i);
+                    }
+                    const floats = new Float32Array(bytes.buffer, bytes.byteOffset, bytes.byteLength / 4);
+
+                    const audioBuffer = audioCtx.createBuffer(1, floats.length, 44100);
+                    audioBuffer.getChannelData(0).set(floats);
+
+                    const source = audioCtx.createBufferSource();
+                    source.buffer = audioBuffer;
+                    source.connect(audioCtx.destination);
+                    
+                    const startTime = Math.max(nextStartTimeRef.current, audioCtx.currentTime);
+                    source.start(startTime);
+                    nextStartTimeRef.current = startTime + audioBuffer.duration;
+                } catch (ce) {
+                    console.error("Audio chunk decode error", ce);
+                }
             } else if (payload.type === 'error') {
               throw new Error(payload.content);
             } else if (payload.type === 'done') {
@@ -275,7 +315,16 @@ function App() {
         }
       }
 
-      setTimeout(() => setOrbState('idle'), 3000);
+      // Calculate exactly how long the scheduled audio buffer takes to finish playing.
+      let delayMs = 3000;
+      if (audioContextRef.current) {
+          const remainingTime = nextStartTimeRef.current - audioContextRef.current.currentTime;
+          if (remainingTime > 0) {
+              delayMs = Math.ceil(remainingTime * 1000) + 500; // Buffer 500ms delay for smoothness
+          }
+      }
+
+      setTimeout(() => setOrbState('idle'), delayMs);
 
     } catch (error) {
       console.error(error);

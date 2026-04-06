@@ -79,11 +79,56 @@ async def chat_stream_generator(user_query: str, session_id: str):
                 full_response += chunk
                 yield f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n"
                 
-        # Handle parsed final answer saving
         import re
         speech_match = re.search(r"<speech>(.*?)</speech>", full_response, re.DOTALL | re.IGNORECASE)
         final_answer = speech_match.group(1).strip() if speech_match else full_response
         sessions[session_id] += f"User: {user_query}\nAvatar: {final_answer}\n"
+        
+        cartesia_api_key = os.getenv("CARTESIA_API_KEY")
+        print(f"DEBUG: Trying Cartesia. Found API Key: {bool(cartesia_api_key)}, Text Length: {len(final_answer)}")
+        
+        if cartesia_api_key and final_answer:
+            try:
+                import requests
+                url = "https://api.cartesia.ai/tts/sse"
+                headers = {
+                    "X-API-Key": cartesia_api_key,
+                    "Cartesia-Version": "2024-06-10",
+                    "Content-Type": "application/json"
+                }
+                data = {
+                    "model_id": "sonic-english",
+                    "transcript": final_answer,
+                    "voice": {
+                        "mode": "id",
+                        "id": "9626c31c-bec5-4cca-baa8-f8ba9e84c8bc"
+                    },
+                    "output_format": {
+                        "container": "raw",
+                        "encoding": "pcm_f32le",
+                        "sample_rate": 44100
+                    }
+                }
+                with requests.post(url, headers=headers, json=data, stream=True) as response:
+                    print(f"DEBUG: Cartesia SSE API Response Status: {response.status_code}")
+                    if response.status_code == 200:
+                        for line in response.iter_lines():
+                            if line:
+                                decoded = line.decode('utf-8')
+                                if decoded.startswith("data: "):
+                                    payload_str = decoded[6:].strip()
+                                    if payload_str == "[DONE]" or not payload_str:
+                                        continue
+                                    try:
+                                        payload = json.loads(payload_str)
+                                        if "data" in payload:
+                                            yield f"data: {json.dumps({'type': 'audio_chunk', 'content': payload['data']})}\n\n"
+                                    except Exception as je:
+                                        pass
+                    else:
+                        print(f"Cartesia TTS Error: {response.text}")
+            except Exception as ttse:
+                print(f"TTS Exception Error: {ttse}")
         
         yield f"data: {json.dumps({'type': 'done'})}\n\n"
         
