@@ -4,7 +4,7 @@ def get_closest_match(user_query: str):
     """Old implementation. Use get_closest_matches instead."""
     pass
 
-def get_closest_matches(user_query: str, k=3):
+def get_closest_matches(user_query: str, k=5):
     """Queries the fine-tuned ChromaDB collection for the k most relevant documents."""
     
     # 1. Get embedding model and embed query
@@ -13,7 +13,7 @@ def get_closest_matches(user_query: str, k=3):
     
     # 2. Get DB Client and collection
     db_client = get_db_client()
-    collection = db_client.get_or_create_collection(name="collection_minilm_finetuned")
+    collection = db_client.get_or_create_collection(name="collection_sales_scenarios")
     
     # 3. Query
     result = collection.query(query_embeddings=[embeddings], n_results=k)
@@ -33,9 +33,7 @@ def get_closest_matches(user_query: str, k=3):
         formatted_results.append({
             "id": ids[i],
             "document": documents[i],
-            "integration_level": metadatas[i].get("integration_level", "Unknown"),
-            "domain": metadatas[i].get("domain", "Unknown"),
-            "avatar_response": metadatas[i].get("avatar_response", "Unknown")
+            "type": metadatas[i].get("type", "Unknown")
         })
         
     return formatted_results

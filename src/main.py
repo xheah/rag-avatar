@@ -41,20 +41,17 @@ def main():
             response = generate_chat_response(user_query=user_query, chat_history=chat_history)
             print(f"\nAvatar: {response}")
         else: # RAG
-            # -- INPUT ENHANCEMENT --
-            new_prompt = rewrite_query(chat_history=chat_history, latest_user_query=user_query)
-            
             # -- RETRIEVAL --
             print("Searching database for similar context...")
             try:
-                retrieved = get_closest_matches(user_query=new_prompt, k=3)
+                retrieved = get_closest_matches(user_query=user_query, k=5)
             except Exception as e:
                 print(f"Error Retrieving from Vector DB: {e}")
                 continue
             
             # -- GENERATION --
             try:
-                response, thoughts = generate_rag_response_v4(user_query=new_prompt, retrieved_documents=retrieved, chat_history=chat_history)
+                response, thoughts = generate_rag_response_v4(user_query=user_query, retrieved_documents=retrieved, chat_history=chat_history)
                 print(f"\nThinking: {thoughts}")
                 print(f"Avatar: {response}")
             except Exception as e:

@@ -68,14 +68,13 @@ async def chat_stream_generator(user_query: str, session_id: str):
                 full_response += chunk
                 yield f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n"
         else: # RAG
-            new_prompt = rewrite_query(chat_history=chat_history, latest_user_query=user_query)
             try:
-                retrieved = get_closest_matches(user_query=new_prompt, k=3)
+                retrieved = get_closest_matches(user_query=user_query, k=5)
             except Exception as re:
                 print(f"Retriever Error: {re}")
                 retrieved = []
             
-            for chunk in generate_rag_response_v4_stream(user_query=new_prompt, retrieved_documents=retrieved, chat_history=chat_history):
+            for chunk in generate_rag_response_v4_stream(user_query=user_query, retrieved_documents=retrieved, chat_history=chat_history):
                 full_response += chunk
                 yield f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n"
                 

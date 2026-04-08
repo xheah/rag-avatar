@@ -35,6 +35,6 @@ def get_llm_client():
 def get_embedding_model():
     global _EMBEDDING_MODEL
     if _EMBEDDING_MODEL is None:
-        model_path = os.path.join(BASE_DIR, "models", "finetuned-minilm-agency-domain")
+        model_path = os.path.join(BASE_DIR, "models", "finetuned-minilm-sales-tutor")
         _EMBEDDING_MODEL = SentenceTransformer(model_path)
     return _EMBEDDING_MODEL

@@ -1,1802 +1,242 @@
 [
     {
-        "query": "How can we minimize manual data entry errors for patient intake?",
-        "gold_ids": [
-            "req_001"
-        ]
+        "scenario_id": "scenario_1",
+        "scenario_context": "Question: Your product is too expensive, similar solutions cost half as much. Rubric/Key Points: 1. Acknowledge and validate the objection. 2. Shift the focus from strictly price to long-term value and ROI. 3. Mention our superior customer support, ease of integration, and higher uptime guarantees. 4. Avoid simply offering a discount immediately.",
+        "rep_answer_query": "I totally understand that pricing is a significant consideration, and it's a valid point that some initial costs might seem higher. However, when we look at the total cost of ownership and the long-term value our solution provides, including our industry-leading 99.99% uptime guarantee, seamless integration with your existing systems, and our dedicated 24/7 customer support, most of our clients find that their ROI significantly outweighs the upfront investment. We're not just selling a product; we're offering a partnership that minimizes downtime and maximizes productivity.",
+        "quality": "good",
+        "expected_score": "95%",
+        "expected_feedback": "Excellent job acknowledging the prospect's concern without getting defensive. You effectively shifted the focus from price to long-term value and ROI, and specifically highlighted superior customer support, ease of integration, and higher uptime. You also avoided offering an immediate discount. This is a very strong response."
+    },
+    {
+        "scenario_id": "scenario_1",
+        "scenario_context": "Question: Your product is too expensive, similar solutions cost half as much. Rubric/Key Points: 1. Acknowledge and validate the objection. 2. Shift the focus from strictly price to long-term value and ROI. 3. Mention our superior customer support, ease of integration, and higher uptime guarantees. 4. Avoid simply offering a discount immediately.",
+        "rep_answer_query": "That's a fair point to bring up, and I appreciate you raising it. Many of our customers initially compare us on price alone. What often becomes clear, though, is the comprehensive value package we offer. Beyond the core functionality, our robust customer support, the sheer ease of integrating our platform into diverse IT environments, and our proven track record for reliability and uptime translate directly into fewer headaches and greater efficiency for your team. It's an investment that pays dividends in operational stability and reduced hidden costs.",
+        "quality": "good",
+        "expected_score": "90%",
+        "expected_feedback": "You successfully validated the objection and pivoted to value. You clearly articulated the benefits of superior customer support, ease of integration, and uptime. The response effectively avoided a discount. A solid, well-rounded answer that addresses all key points."
+    },
+    {
+        "scenario_id": "scenario_1",
+        "scenario_context": "Question: Your product is too expensive, similar solutions cost half as much. Rubric/Key Points: 1. Acknowledge and validate the objection. 2. Shift the focus from strictly price to long-term value and ROI. 3. Mention our superior customer support, ease of integration, and higher uptime guarantees. 4. Avoid simply offering a discount immediately.",
+        "rep_answer_query": "I hear you, and it's completely natural to compare prices. It's true that there are cheaper options out there, but I'd encourage you to consider what those 'similar' solutions might be missing. Our platform is built for enterprise-level demands, offering unparalleled stability with guaranteed uptime, and our dedicated account managers provide proactive support that prevents issues before they even arise. The time and resources saved from troubleshooting, combined with our quick and easy deployment, often result in a much higher ROI over a few years, making the initial investment a strategic advantage rather than just an expense.",
+        "quality": "good",
+        "expected_score": "85%",
+        "expected_feedback": "You acknowledged the objection well and shifted the focus to long-term value and ROI. You mentioned uptime and superior support, which is good. While you didn't explicitly use the phrase 'ease of integration', the mention of 'quick and easy deployment' touches upon it. You successfully avoided offering a discount."
+    },
+    {
+        "scenario_id": "scenario_1",
+        "scenario_context": "Question: Your product is too expensive, similar solutions cost half as much. Rubric/Key Points: 1. Acknowledge and validate the objection. 2. Shift the focus from strictly price to long-term value and ROI. 3. Mention our superior customer support, ease of integration, and higher uptime guarantees. 4. Avoid simply offering a discount immediately.",
+        "rep_answer_query": "Well, our product is expensive because it's the best. Those other solutions probably cut corners. Look, if price is your only concern, maybe this isn't the right fit. But if you want the best, you pay for it. I can maybe get you a 10% discount if you sign today.",
+        "quality": "bad",
+        "expected_score": "15%",
+        "expected_feedback": "This response is defensive and dismissive, failing to acknowledge or validate the prospect's objection. It also immediately offers a discount, which goes against the rubric. There's no attempt to shift focus to value or mention key differentiators like support, integration, or uptime. This approach can alienate the prospect."
+    },
+    {
+        "scenario_id": "scenario_1",
+        "scenario_context": "Question: Your product is too expensive, similar solutions cost half as much. Rubric/Key Points: 1. Acknowledge and validate the objection. 2. Shift the focus from strictly price to long-term value and ROI. 3. Mention our superior customer support, ease of integration, and higher uptime guarantees. 4. Avoid simply offering a discount immediately.",
+        "rep_answer_query": "I understand your concern about the price. We believe our product offers a lot of features. It has X, Y, and Z, which are really advanced. If it's too much, I'm sure we can figure something out, maybe a smaller package?",
+        "quality": "bad",
+        "expected_score": "30%",
+        "expected_feedback": "While you acknowledged the objection, you failed to effectively shift the focus to long-term value or ROI. Simply listing features isn't enough to justify a higher price. You also hinted at offering a 'smaller package' which could be perceived as a concession or discount, rather than reinforcing value. You missed mentioning superior customer support, ease of integration, or higher uptime guarantees."
+    },
+    {
+        "scenario_id": "scenario_1",
+        "scenario_context": "Question: Your product is too expensive, similar solutions cost half as much. Rubric/Key Points: 1. Acknowledge and validate the objection. 2. Shift the focus from strictly price to long-term value and ROI. 3. Mention our superior customer support, ease of integration, and higher uptime guarantees. 4. Avoid simply offering a discount immediately.",
+        "rep_answer_query": "Yes, our product does have a premium price tag. That's because it's built with superior materials and cutting-edge technology. It's just a better product, pure and simple. You get what you pay for, right? The others are probably just cheap knock-offs.",
+        "quality": "bad",
+        "expected_score": "20%",
+        "expected_feedback": "You acknowledged the price but immediately became defensive and dismissive of competitors, which is not helpful. You failed to shift the focus to long-term value, ROI, or specific benefits like customer support, ease of integration, or uptime. The response comes across as arrogant and doesn't address the prospect's underlying concern about cost-effectiveness."
+    },
+    {
+        "scenario_id": "scenario_2",
+        "scenario_context": "Question: How does your product differ from Competitor X? Rubric/Key Points: 1. Avoid bashing the competitor directly or being defensive. 2. Highlight our unique features: native API, built-in advanced analytics, and enterprise-grade security. 3. Pinpoint how these specific features directly solve the prospect's unique pain point.",
+        "rep_answer_query": "That's a great question. While Competitor X has its strengths, what truly sets us apart are a few key areas that directly impact how you can leverage our solution. Our native API offers unparalleled integration flexibility, allowing you to seamlessly connect with your existing systems without complex workarounds. We also provide built-in advanced analytics, giving you actionable insights right within the platform, eliminating the need for separate tools. And crucially, our enterprise-grade security is designed from the ground up to protect your sensitive data, offering peace of mind and compliance. We find these capabilities are particularly valuable for organizations looking for deep integration, comprehensive data insights, and robust security.",
+        "quality": "good",
+        "expected_score": "90%",
+        "expected_feedback": "Excellent! You avoided bashing Competitor X and effectively highlighted our unique features: native API, built-in advanced analytics, and enterprise-grade security. You also did a great job connecting these features to general benefits like integration flexibility, actionable insights, and data protection, which are common pain points for prospects."
+    },
+    {
+        "scenario_id": "scenario_2",
+        "scenario_context": "Question: How does your product differ from Competitor X? Rubric/Key Points: 1. Avoid bashing the competitor directly or being defensive. 2. Highlight our unique features: native API, built-in advanced analytics, and enterprise-grade security. 3. Pinpoint how these specific features directly solve the prospect's unique pain point.",
+        "rep_answer_query": "It's common for prospects to compare us with Competitor X, and there are certainly differences. Our platform is built with a native API, which means deep, seamless integration into your existing tech stack, unlike workarounds some other solutions might require. We also offer built-in advanced analytics, providing real-time, actionable insights directly within the platform, so you're not juggling multiple tools for data analysis. And for businesses handling sensitive information, our enterprise-grade security provides a robust, compliant environment designed to keep your data safe. These differentiators are critical for companies seeking efficiency, deep data understanding, and uncompromised security.",
+        "quality": "good",
+        "expected_score": "85%",
+        "expected_feedback": "Good job addressing the comparison without being defensive. You clearly articulated the unique benefits of our native API, built-in advanced analytics, and enterprise-grade security, linking them to common business needs for efficiency and data protection. Remember to always try to pivot to the prospect's specific pain point if known."
+    },
+    {
+        "scenario_id": "scenario_2",
+        "scenario_context": "Question: How does your product differ from Competitor X? Rubric/Key Points: 1. Avoid bashing the competitor directly or being defensive. 2. Highlight our unique features: native API, built-in advanced analytics, and enterprise-grade security. 3. Pinpoint how these specific features directly solve the prospect's unique pain point.",
+        "rep_answer_query": "Many of our clients have evaluated Competitor X. What they often find differentiates us is our focus on core capabilities that solve specific challenges. For instance, if you're looking for deep system integration, our native API provides a level of flexibility and efficiency that generic connectors can't match. If gaining immediate, actionable insights from your data is key, our built-in advanced analytics deliver that without the need for exporting to other platforms. And for any organization where data integrity and compliance are paramount, our enterprise-grade security offers a superior framework. These features are designed to directly address the complexities of modern business operations, ensuring you get more out of your investment.",
+        "quality": "good",
+        "expected_score": "90%",
+        "expected_feedback": "Excellent answer! You gracefully handled the comparison without disparaging Competitor X. You skillfully highlighted the native API, built-in advanced analytics, and enterprise-grade security, and critically, you framed these features as direct solutions to common business pain points like integration challenges, data insight needs, and security concerns. This shows a strong understanding of value proposition."
+    },
+    {
+        "scenario_id": "scenario_2",
+        "scenario_context": "Question: How does your product differ from Competitor X? Rubric/Key Points: 1. Avoid bashing the competitor directly or being defensive. 2. Highlight our unique features: native API, built-in advanced analytics, and enterprise-grade security. 3. Pinpoint how these specific features directly solve the prospect's unique pain point.",
+        "rep_answer_query": "Oh, Competitor X? Honestly, they're pretty outdated. Their API is clunky, their analytics are basic, and their security is just standard. We're much better because we're modern and innovative. You wouldn't want to go with them if you're serious about your business.",
+        "quality": "bad",
+        "expected_score": "20%",
+        "expected_feedback": "This answer directly bashes the competitor and is highly defensive, which violates the first rubric point. It also fails to specifically highlight our unique features or connect them to any prospect pain points. You need to focus on our strengths, not the competitor's weaknesses, and always maintain a professional tone."
+    },
+    {
+        "scenario_id": "scenario_2",
+        "scenario_context": "Question: How does your product differ from Competitor X? Rubric/Key Points: 1. Avoid bashing the competitor directly or being defensive. 2. Highlight our unique features: native API, built-in advanced analytics, and enterprise-grade security. 3. Pinpoint how these specific features directly solve the prospect's unique pain point.",
+        "rep_answer_query": "Well, we have a native API, built-in advanced analytics, and enterprise-grade security. Competitor X might have some of those, but ours are better. That's really all you need to know.",
+        "quality": "bad",
+        "expected_score": "35%",
+        "expected_feedback": "While you did list the unique features, the delivery was defensive and lacked elaboration on their benefits. You didn't avoid being defensive and completely missed the opportunity to explain *how* these features solve specific pain points for the prospect. Simply stating 'ours are better' isn't persuasive or helpful."
+    },
+    {
+        "scenario_id": "scenario_2",
+        "scenario_context": "Question: How does your product differ from Competitor X? Rubric/Key Points: 1. Avoid bashing the competitor directly or being defensive. 2. Highlight our unique features: native API, built-in advanced analytics, and enterprise-grade security. 3. Pinpoint how these specific features directly solve the prospect's unique pain point.",
+        "rep_answer_query": "We're a leading solution in the market, and we focus on providing value to our customers. We have a great team and a solid product roadmap. Every company is different, so it really depends on what you're looking for.",
+        "quality": "bad",
+        "expected_score": "10%",
+        "expected_feedback": "This answer completely avoids the question and fails to differentiate our product from Competitor X. You did not highlight any of our unique features (native API, built-in advanced analytics, enterprise-grade security) nor did you attempt to connect them to any potential pain points. This response is too generic and unhelpful for the prospect."
+    },
+    {
+        "scenario_id": "scenario_3",
+        "scenario_context": "Question: We don't have the budget for this right now, try us again in 6 months. Rubric/Key Points: 1. Uncover if budget is the genuine constraint or if it's masking a lack of urgency. 2. Ask a clarifying question like 'If budget wasn't an issue, would this be the right solution?'. 3. If the timeline is strict, explore flexible payment terms or scaled-down starting packages.",
+        "rep_answer_query": "I completely understand budget constraints are a real factor. Just so I can better understand, if budget weren't an issue at all, would this solution be a perfect fit for your needs right now? My concern is that waiting six months might mean missing out on the immediate benefits we discussed. Perhaps we could explore a phased approach or a more flexible payment structure to get you started sooner?",
+        "quality": "good",
+        "expected_score": "90%",
+        "expected_feedback": "Excellent job uncovering the true nature of the budget objection. You asked a great clarifying question to test urgency and then proactively offered flexible payment terms and scaled-down options, hitting all key points of the rubric."
     },
     {
-        "query": "Is there a way to automatically sync patient forms into our EHR?",
-        "gold_ids": [
-            "req_001"
-        ]
+        "scenario_id": "scenario_3",
+        "scenario_context": "Question: We don't have the budget for this right now, try us again in 6 months. Rubric/Key Points: 1. Uncover if budget is the genuine constraint or if it's masking a lack of urgency. 2. Ask a clarifying question like 'If budget wasn't an issue, would this be the right solution?'. 3. If the timeline is strict, explore flexible payment terms or scaled-down starting packages.",
+        "rep_answer_query": "I appreciate your transparency. Many of our clients face similar budget cycles. However, I'm curious, what would be the cost of waiting six months to address the challenges we discussed? If we could find a way to make this work sooner, perhaps by starting with a smaller module or a trial, would that be something worth exploring to avoid those potential costs or missed opportunities?",
+        "quality": "good",
+        "expected_score": "85%",
+        "expected_feedback": "You effectively probed the cost of inaction, which helps uncover urgency. You also offered scaled-down options to make it more accessible now. While you didn't use the exact clarifying question from the rubric, your approach served a similar purpose in understanding priorities."
     },
     {
-        "query": "What solution do you have for automating patient registration data transfer?",
-        "gold_ids": [
-            "req_001"
-        ]
+        "scenario_id": "scenario_3",
+        "scenario_context": "Question: We don't have the budget for this right now, try us again in 6 months. Rubric/Key Points: 1. Uncover if budget is the genuine constraint or if it's masking a lack of urgency. 2. Ask a clarifying question like 'If budget wasn't an issue, would this be the right solution?'. 3. If the timeline is strict, explore flexible payment terms or scaled-down starting packages.",
+        "rep_answer_query": "I hear you on the budget, and timing is key. Let me ask you, if the budget wasn't a barrier, do you see this as the ideal solution to solve [specific problem discussed] for your team today? If so, sometimes we can work with clients on payment plans or even a pilot program that aligns better with current budget cycles. Would it be worth a few minutes to see if we can tailor something for you that fits within your immediate constraints?",
+        "quality": "good",
+        "expected_score": "95%",
+        "expected_feedback": "Fantastic! You directly addressed the budget, then used the exact clarifying question to test urgency and fit. Following that, you immediately pivoted to exploring flexible payment terms and scaled-down options, demonstrating a strong understanding of how to overcome this objection."
     },
     {
-        "query": "How can I automate the monitoring of new infectious disease outbreaks in medical literature?",
-        "gold_ids": [
-            "req_002"
-        ]
+        "scenario_id": "scenario_3",
+        "scenario_context": "Question: We don't have the budget for this right now, try us again in 6 months. Rubric/Key Points: 1. Uncover if budget is the genuine constraint or if it's masking a lack of urgency. 2. Ask a clarifying question like 'If budget wasn't an issue, would this be the right solution?'. 3. If the timeline is strict, explore flexible payment terms or scaled-down starting packages.",
+        "rep_answer_query": "Okay, I understand. Budget cycles can be tough. I'll make a note to reach out again in six months. Thanks for your time today.",
+        "quality": "bad",
+        "expected_score": "10%",
+        "expected_feedback": "This answer completely failed to address the core objection. You accepted the budget constraint at face value and agreed to the prospect's timeline without attempting to uncover urgency, clarify fit, or explore alternative solutions. This is a missed opportunity."
     },
     {
-        "query": "Can you build a system to track daily news and journal publications for specific health threats?",
-        "gold_ids": [
-            "req_002"
-        ]
+        "scenario_id": "scenario_3",
+        "scenario_context": "Question: We don't have the budget for this right now, try us again in 6 months. Rubric/Key Points: 1. Uncover if budget is the genuine constraint or if it's masking a lack of urgency. 2. Ask a clarifying question like 'If budget wasn't an issue, would this be the right solution?'. 3. If the timeline is strict, explore flexible payment terms or scaled-down starting packages.",
+        "rep_answer_query": "But waiting six months means you'll continue to struggle with [problem]. Our solution is really the best way to fix this. Are you sure you can't find some budget now? The ROI would be significant.",
+        "quality": "bad",
+        "expected_score": "30%",
+        "expected_feedback": "While you attempted to highlight the cost of inaction, you came across as pushy and didn't ask a clarifying question to truly understand the budget issue versus urgency. You also failed to offer any flexible payment terms or scaled-down packages, which are crucial for overcoming this objection."
     },
     {
-        "query": "What is the best way to aggregate real-time updates on emerging pathogens from public health sources?",
-        "gold_ids": [
-            "req_002"
-        ]
-    },
-    {
-        "query": "Can you automate the creation of weekly reports regarding hospital bed capacity?",
-        "gold_ids": [
-            "req_003"
-        ]
-    },
-    {
-        "query": "How can we track patient flow across different departments using our existing data files?",
-        "gold_ids": [
-            "req_003"
-        ]
-    },
-    {
-        "query": "Is it possible to generate recurring summaries of occupancy rates from our internal CSVs?",
-        "gold_ids": [
-            "req_003"
-        ]
-    },
-    {
-        "query": "How can I set up automated text message reminders for patient follow-up appointments?",
-        "gold_ids": [
-            "req_004"
-        ]
-    },
-    {
-        "query": "Is there a way to integrate my EHR system to send personalized SMS notifications to patients?",
-        "gold_ids": [
-            "req_004"
-        ]
-    },
-    {
-        "query": "Can we automate appointment scheduling communications based on existing patient records?",
-        "gold_ids": [
-            "req_004"
-        ]
-    },
-    {
-        "query": "How can I turn my stack of paper medical faxes into searchable digital documents?",
-        "gold_ids": [
-            "req_005"
-        ]
-    },
-    {
-        "query": "Do you offer services to digitize and index patient referral records?",
-        "gold_ids": [
-            "req_005"
-        ]
-    },
-    {
-        "query": "What is the best way to convert scanned lab result images into text-searchable files?",
-        "gold_ids": [
-            "req_005"
-        ]
-    },
-    {
-        "query": "Can you help me pull A1C and cholesterol data from multiple PDF lab reports into one file?",
-        "gold_ids": [
-            "req_006"
-        ]
-    },
-    {
-        "query": "How can I automate the extraction of key health markers from my collection of pathology PDFs?",
-        "gold_ids": [
-            "req_006"
-        ]
-    },
-    {
-        "query": "Is there a way to consolidate my lab test history from different documents to track my health trends?",
-        "gold_ids": [
-            "req_006"
-        ]
-    },
-    {
-        "query": "How can we streamline the tracking of medical inventory using barcode technology?",
-        "gold_ids": [
-            "req_007"
-        ]
-    },
-    {
-        "query": "Can you provide a solution that automatically notifies us when medical supplies need to be restocked?",
-        "gold_ids": [
-            "req_007"
-        ]
-    },
-    {
-        "query": "What is the best way to digitize our supply chain to ensure we never run out of essential medical items?",
-        "gold_ids": [
-            "req_007"
-        ]
-    },
-    {
-        "query": "How can we reduce the risk of leaving surgical tools inside a patient during an operation?",
-        "gold_ids": [
-            "req_008"
-        ]
-    },
-    {
-        "query": "Is there a way to automate the tracking and counting of surgical instruments in real-time?",
-        "gold_ids": [
-            "req_008"
-        ]
-    },
-    {
-        "query": "Can computer vision technology be used in the operating room to improve patient safety protocols?",
-        "gold_ids": [
-            "req_008"
-        ]
-    },
-    {
-        "query": "How can we build a system that lets doctors search through thousands of medical papers to find clinical evidence?",
-        "gold_ids": [
-            "req_009"
-        ]
-    },
-    {
-        "query": "Can you create a RAG solution that helps our staff retrieve accurate information from clinical guidelines?",
-        "gold_ids": [
-            "req_009"
-        ]
-    },
-    {
-        "query": "What is the best way to implement an AI tool for clinicians to query our internal database of medical research?",
-        "gold_ids": [
-            "req_009"
-        ]
-    },
-    {
-        "query": "How can we aggregate fragmented data from our EHR, billing, and lab systems into one view?",
-        "gold_ids": [
-            "req_010"
-        ]
-    },
-    {
-        "query": "What is the best way to integrate real-time wearable device data with our existing clinical records?",
-        "gold_ids": [
-            "req_010"
-        ]
-    },
-    {
-        "query": "Can you build a secure, unified dashboard that connects all our disparate patient data sources?",
-        "gold_ids": [
-            "req_010"
-        ]
-    },
-    {
-        "query": "How can we automate the detection of abnormalities in medical imaging?",
-        "gold_ids": [
-            "req_011"
-        ]
-    },
-    {
-        "query": "What solution can help radiologists prioritize their review of CT and MRI scans?",
-        "gold_ids": [
-            "req_011"
-        ]
-    },
-    {
-        "query": "Can you develop an AI tool to assist in the diagnostic analysis of radiological images?",
-        "gold_ids": [
-            "req_011"
-        ]
-    },
-    {
-        "query": "How can we automate the detection of dangerous drug interactions in our patient records?",
-        "gold_ids": [
-            "req_012"
-        ]
-    },
-    {
-        "query": "Do you have a solution for real-time monitoring of medication lists to trigger adverse event reports?",
-        "gold_ids": [
-            "req_012"
-        ]
-    },
-    {
-        "query": "Can you develop a system that flags potential drug-drug conflicts as soon as a new prescription is added?",
-        "gold_ids": [
-            "req_012"
-        ]
-    },
-    {
-        "query": "How can we automate the creation of custom recovery guides for patients based on their medical history?",
-        "gold_ids": [
-            "req_013"
-        ]
-    },
-    {
-        "query": "Is there a way to provide patients with personalized health information directly linked to their electronic health records?",
-        "gold_ids": [
-            "req_013"
-        ]
-    },
-    {
-        "query": "Can we develop a digital portal that generates tailored wellness plans according to specific patient conditions?",
-        "gold_ids": [
-            "req_013"
-        ]
-    },
-    {
-        "query": "How can we streamline the manual prior authorization workflow?",
-        "gold_ids": [
-            "req_014"
-        ]
-    },
-    {
-        "query": "Is there a way to automatically pull clinical data from EHRs for insurance submissions?",
-        "gold_ids": [
-            "req_014"
-        ]
-    },
-    {
-        "query": "Can your software integrate with payer portals to handle authorization requests directly?",
-        "gold_ids": [
-            "req_014"
-        ]
-    },
-    {
-        "query": "How can we automate our hospital's end-to-end supply chain management?",
-        "gold_ids": [
-            "req_015"
-        ]
-    },
-    {
-        "query": "Is it possible to develop an autonomous system for procurement and demand forecasting in a healthcare setting?",
-        "gold_ids": [
-            "req_015"
-        ]
-    },
-    {
-        "query": "Can we replace manual vendor management and inventory replenishment with an AI-driven solution?",
-        "gold_ids": [
-            "req_015"
-        ]
-    },
-    {
-        "query": "How can we automate the management and optimization of clinical trial protocols?",
-        "gold_ids": [
-            "req_016"
-        ]
-    },
-    {
-        "query": "Is there a solution for autonomous patient recruitment and real-time data analysis in clinical trials?",
-        "gold_ids": [
-            "req_016"
-        ]
-    },
-    {
-        "query": "Can AI be used to adaptively manage clinical trial workflows and improve study outcomes?",
-        "gold_ids": [
-            "req_016"
-        ]
-    },
-    {
-        "query": "Can you develop an AI system that acts as an autonomous virtual doctor for patient care?",
-        "gold_ids": [
-            "req_017"
-        ]
-    },
-    {
-        "query": "How can we integrate AGI into telehealth to diagnose illnesses and create treatment plans?",
-        "gold_ids": [
-            "req_017"
-        ]
-    },
-    {
-        "query": "Is it possible to build an automated virtual physician capable of conducting full patient consultations?",
-        "gold_ids": [
-            "req_017"
-        ]
-    },
-    {
-        "query": "How can we automate hospital workflow management to reduce operational bottlenecks?",
-        "gold_ids": [
-            "req_018"
-        ]
-    },
-    {
-        "query": "Is there a way to implement a self-correcting system for real-time hospital efficiency monitoring?",
-        "gold_ids": [
-            "req_018"
-        ]
-    },
-    {
-        "query": "Can you build an autonomous solution that monitors and optimizes departmental performance in a medical facility?",
-        "gold_ids": [
-            "req_018"
-        ]
-    },
-    {
-        "query": "How can we automate the end-to-end drug discovery lifecycle from compound design to preclinical trials?",
-        "gold_ids": [
-            "req_019"
-        ]
-    },
-    {
-        "query": "What is the best way to implement a self-optimizing platform for generating and testing new drug candidates?",
-        "gold_ids": [
-            "req_019"
-        ]
-    },
-    {
-        "query": "Can you provide a system architecture that integrates AI-driven molecule design with automated preclinical simulation?",
-        "gold_ids": [
-            "req_019"
-        ]
-    },
-    {
-        "query": "How can we use artificial intelligence to automate the ongoing management of chronic illnesses?",
-        "gold_ids": [
-            "req_020"
-        ]
-    },
-    {
-        "query": "What is the best approach for building an autonomous system that coordinates care and updates treatment plans using real-time patient data?",
-        "gold_ids": [
-            "req_020"
-        ]
-    },
-    {
-        "query": "Can you design a solution that proactively manages chronic disease patients through continuous data analysis and AI-driven interventions?",
-        "gold_ids": [
-            "req_020"
-        ]
-    },
-    {
-        "query": "How can we digitize our physical delivery receipts automatically?",
-        "gold_ids": [
-            "req_021"
-        ]
-    },
-    {
-        "query": "Is there a way to sync scanned proof-of-delivery documents directly into our TMS?",
-        "gold_ids": [
-            "req_021"
-        ]
-    },
-    {
-        "query": "Can you provide a solution to eliminate manual data entry for incoming shipping receipts?",
-        "gold_ids": [
-            "req_021"
-        ]
-    },
-    {
-        "query": "How can I automate the daily collection of freight rates from competitor websites?",
-        "gold_ids": [
-            "req_022"
-        ]
-    },
-    {
-        "query": "Is it possible to track route availability updates from logistics portals automatically?",
-        "gold_ids": [
-            "req_022"
-        ]
-    },
-    {
-        "query": "Can you help me monitor competitor pricing trends in the shipping industry on a daily basis?",
-        "gold_ids": [
-            "req_022"
-        ]
-    },
-    {
-        "query": "How can I get a daily summary of how much fuel my vehicles are using?",
-        "gold_ids": [
-            "req_023"
-        ]
-    },
-    {
-        "query": "Is there a way to automatically track and report on how safely my drivers are operating the fleet?",
-        "gold_ids": [
-            "req_023"
-        ]
-    },
-    {
-        "query": "Can the system generate daily analytics for fuel efficiency and driver behavior based on telematics?",
-        "gold_ids": [
-            "req_023"
-        ]
-    },
-    {
-        "query": "How can I set up automated email notifications when my stock levels drop below a certain threshold?",
-        "gold_ids": [
-            "req_024"
-        ]
-    },
-    {
-        "query": "Is there a way to integrate my inventory system with the procurement team to alert them of shortages?",
-        "gold_ids": [
-            "req_024"
-        ]
-    },
-    {
-        "query": "Can you provide a script that monitors inventory in real-time and notifies the purchasing department when items are running low?",
-        "gold_ids": [
-            "req_024"
-        ]
-    },
-    {
-        "query": "How can we streamline the process of verifying carrier charges against our negotiated contracts?",
-        "gold_ids": [
-            "req_025"
-        ]
-    },
-    {
-        "query": "Is there a way to automatically detect discrepancies between our freight invoices and expected rates?",
-        "gold_ids": [
-            "req_025"
-        ]
-    },
-    {
-        "query": "What solution can help us eliminate manual errors when auditing carrier billing?",
-        "gold_ids": [
-            "req_025"
-        ]
-    },
-    {
-        "query": "Can you develop a tool to automatically extract live shipping port traffic data?",
-        "gold_ids": [
-            "req_026"
-        ]
-    },
-    {
-        "query": "I need a web scraper that pulls current congestion metrics from maritime websites, can you build that?",
-        "gold_ids": [
-            "req_026"
-        ]
-    },
-    {
-        "query": "How can I get real-time port status updates using automated data collection?",
-        "gold_ids": [
-            "req_026"
-        ]
-    },
-    {
-        "query": "How can we automate alerts when our refrigerated container temperatures go out of range?",
-        "gold_ids": [
-            "req_027"
-        ]
-    },
-    {
-        "query": "What is the best way to monitor IoT sensor data from our cold chain fleet in real-time?",
-        "gold_ids": [
-            "req_027"
-        ]
-    },
-    {
-        "query": "Can you build a system that notifies our operations team immediately if a freezer unit malfunctions?",
-        "gold_ids": [
-            "req_027"
-        ]
-    },
-    {
-        "query": "How can we automate answering regulatory compliance queries using our existing internal documentation?",
-        "gold_ids": [
-            "req_028"
-        ]
-    },
-    {
-        "query": "Can you build a system that retrieves accurate information from our logistics manuals for customer support?",
-        "gold_ids": [
-            "req_028"
-        ]
-    },
-    {
-        "query": "We need a solution to quickly query complex shipping regulations; can you develop a RAG pipeline for this?",
-        "gold_ids": [
-            "req_028"
-        ]
-    },
-    {
-        "query": "How can we automate the measurement of package dimensions on our conveyor lines?",
-        "gold_ids": [
-            "req_029"
-        ]
-    },
-    {
-        "query": "Is there a way to use computer vision to detect damaged boxes during the sortation process?",
-        "gold_ids": [
-            "req_029"
-        ]
-    },
-    {
-        "query": "What technology can we implement to streamline our quality control and sizing workflow in the warehouse?",
-        "gold_ids": [
-            "req_029"
-        ]
-    },
-    {
-        "query": "How can we automate tracking updates from our shipping carriers directly into our ERP system?",
-        "gold_ids": [
-            "req_030"
-        ]
-    },
-    {
-        "query": "Is there a way to automatically fetch and store proof-of-delivery documents for our customer orders?",
-        "gold_ids": [
-            "req_030"
-        ]
-    },
-    {
-        "query": "Can you integrate our ERP with third-party carrier platforms to provide real-time shipment visibility?",
-        "gold_ids": [
-            "req_030"
-        ]
-    },
-    {
-        "query": "How can we use past sales and economic data to predict future demand?",
-        "gold_ids": [
-            "req_031"
-        ]
-    },
-    {
-        "query": "Can you build a machine learning model to improve our sales forecasting accuracy?",
-        "gold_ids": [
-            "req_031"
-        ]
-    },
-    {
-        "query": "What factors should we incorporate into a predictive model for seasonal demand planning?",
-        "gold_ids": [
-            "req_031"
-        ]
-    },
-    {
-        "query": "How can we achieve real-time inventory tracking across all our warehouse locations?",
-        "gold_ids": [
-            "req_032"
-        ]
-    },
-    {
-        "query": "Do you have a solution for synchronizing stock levels dynamically between multiple distribution centers?",
-        "gold_ids": [
-            "req_032"
-        ]
-    },
-    {
-        "query": "Can you build an automated system to provide live inventory visibility throughout our supply chain?",
-        "gold_ids": [
-            "req_032"
-        ]
-    },
-    {
-        "query": "How can I reduce empty miles for my fleet using automation?",
-        "gold_ids": [
-            "req_033"
-        ]
-    },
-    {
-        "query": "Is there a way to integrate third-party freight boards to auto-book return loads?",
-        "gold_ids": [
-            "req_033"
-        ]
-    },
-    {
-        "query": "Can you build a system to streamline the backhaul booking process via APIs?",
-        "gold_ids": [
-            "req_033"
-        ]
-    },
-    {
-        "query": "How can I fully automate my warehouse operations using advanced AI?",
-        "gold_ids": [
-            "req_034"
-        ]
-    },
-    {
-        "query": "What is the best way to implement an autonomous system for picking, packing, and dispatch?",
-        "gold_ids": [
-            "req_034"
-        ]
-    },
-    {
-        "query": "Can you provide a solution for AI-driven labor optimization and end-to-end warehouse management?",
-        "gold_ids": [
-            "req_034"
-        ]
-    },
-    {
-        "query": "How can we automate our supply chain risk management to handle global disruptions?",
-        "gold_ids": [
-            "req_035"
-        ]
-    },
-    {
-        "query": "What strategies exist for building a self-correcting supply chain that adapts to geopolitical changes?",
-        "gold_ids": [
-            "req_035"
-        ]
-    },
-    {
-        "query": "Can you provide a solution for dynamic supplier management and autonomous rerouting to mitigate logistics risks?",
-        "gold_ids": [
-            "req_035"
-        ]
-    },
-    {
-        "query": "How can we use artificial general intelligence to improve the efficiency of our international shipping and logistics operations?",
-        "gold_ids": [
-            "req_036"
-        ]
-    },
-    {
-        "query": "Can you build a self-optimizing system that manages complex supply chain networks across multiple modes of transport?",
-        "gold_ids": [
-            "req_036"
-        ]
-    },
-    {
-        "query": "What solutions exist for creating an AI-driven platform that automatically reduces transportation costs through machine learning?",
-        "gold_ids": [
-            "req_036"
-        ]
-    },
-    {
-        "query": "How can we automate the end-to-end processing of international customs documentation?",
-        "gold_ids": [
-            "req_037"
-        ]
-    },
-    {
-        "query": "Is there a way to build a system that automatically adjusts to shifting global customs regulations?",
-        "gold_ids": [
-            "req_037"
-        ]
-    },
-    {
-        "query": "Can you develop an autonomous solution to streamline our cross-border clearance procedures?",
-        "gold_ids": [
-            "req_037"
-        ]
-    },
-    {
-        "query": "How can we automate the end-to-end management of our corporate vehicle fleet?",
-        "gold_ids": [
-            "req_038"
-        ]
-    },
-    {
-        "query": "Is there a way to use AI to handle fleet procurement and maintenance scheduling?",
-        "gold_ids": [
-            "req_038"
-        ]
-    },
-    {
-        "query": "Can you develop an intelligent system for managing the entire lifecycle of our vehicles?",
-        "gold_ids": [
-            "req_038"
-        ]
-    },
-    {
-        "query": "How can we automate our freight pricing based on real-time market changes?",
-        "gold_ids": [
-            "req_039"
-        ]
-    },
-    {
-        "query": "What is the best way to optimize capacity allocation using machine learning?",
-        "gold_ids": [
-            "req_039"
-        ]
-    },
-    {
-        "query": "Can you build a self-optimizing system to improve our brokerage profit margins?",
-        "gold_ids": [
-            "req_039"
-        ]
-    },
-    {
-        "query": "How can we automate our container loading process to reduce shipping costs?",
-        "gold_ids": [
-            "req_040"
-        ]
-    },
-    {
-        "query": "What solutions are available to maximize space utilization in international palletized shipments?",
-        "gold_ids": [
-            "req_040"
-        ]
-    },
-    {
-        "query": "Do you have a system that optimizes container stuffing strategies in real-time?",
-        "gold_ids": [
-            "req_040"
-        ]
-    },
-    {
-        "query": "How can I digitize paper bank statements and sync them with my accounting platform?",
-        "gold_ids": [
-            "req_041"
-        ]
-    },
-    {
-        "query": "Is there a way to automate the data entry process for scanned financial documents?",
-        "gold_ids": [
-            "req_041"
-        ]
-    },
-    {
-        "query": "Can you help me pull transaction details from PDF statements into my bookkeeping software?",
-        "gold_ids": [
-            "req_041"
-        ]
-    },
-    {
-        "query": "Can you build a tool to automatically track live stock market data from a financial website?",
-        "gold_ids": [
-            "req_042"
-        ]
-    },
-    {
-        "query": "How can we monitor price and volume changes for specific stocks using a web scraper?",
-        "gold_ids": [
-            "req_042"
-        ]
-    },
-    {
-        "query": "Do you have a solution for extracting real-time trading metrics from public financial news portals?",
-        "gold_ids": [
-            "req_042"
-        ]
-    },
-    {
-        "query": "How can I automate my daily portfolio performance reporting using trading platform data?",
-        "gold_ids": [
-            "req_043"
-        ]
-    },
-    {
-        "query": "Is there a way to generate a summary of my trading account performance from CSV exports?",
-        "gold_ids": [
-            "req_043"
-        ]
-    },
-    {
-        "query": "Can you build a script to process my daily trading CSVs and create performance reports?",
-        "gold_ids": [
-            "req_043"
-        ]
-    },
-    {
-        "query": "How can I set up automatic email notifications for when my stocks hit a certain price?",
-        "gold_ids": [
-            "req_044"
-        ]
-    },
-    {
-        "query": "Is there a way to get alerted via email when a stock exceeds my target buy or sell price?",
-        "gold_ids": [
-            "req_044"
-        ]
-    },
-    {
-        "query": "Can you build a system that monitors my portfolio and emails me as soon as a price threshold is triggered?",
-        "gold_ids": [
-            "req_044"
-        ]
-    },
-    {
-        "query": "How can I migrate my old financial records into a modern SQL database?",
-        "gold_ids": [
-            "req_045"
-        ]
-    },
-    {
-        "query": "Do you provide services to convert proprietary data formats into a standardized schema?",
-        "gold_ids": [
-            "req_045"
-        ]
-    },
-    {
-        "query": "What is the process for moving a large archive of legacy financial files into a SQL-based system?",
-        "gold_ids": [
-            "req_045"
-        ]
-    },
-    {
-        "query": "Can you help me streamline the comparison of my trading records against my client holding statements?",
-        "gold_ids": [
-            "req_046"
-        ]
-    },
-    {
-        "query": "Is there a way to automatically reconcile data between two separate spreadsheets?",
-        "gold_ids": [
-            "req_046"
-        ]
-    },
-    {
-        "query": "How can I reduce manual effort when checking for discrepancies in my trading and holding reports?",
-        "gold_ids": [
-            "req_046"
-        ]
-    },
-    {
-        "query": "How can I automate the process of capturing stock data from news reports into a spreadsheet?",
-        "gold_ids": [
-            "req_047"
-        ]
-    },
-    {
-        "query": "What is the best way to extract and organize daily market figures like ticker symbols and volume from articles?",
-        "gold_ids": [
-            "req_047"
-        ]
-    },
-    {
-        "query": "Can you provide a solution for updating my financial tracking sheet using information found in daily news updates?",
-        "gold_ids": [
-            "req_047"
-        ]
-    },
-    {
-        "query": "How can I connect my custom trading algorithm to brokerage platforms for automated execution?",
-        "gold_ids": [
-            "req_048"
-        ]
-    },
-    {
-        "query": "Do you offer services to integrate proprietary HFT software with multiple broker APIs?",
-        "gold_ids": [
-            "req_048"
-        ]
-    },
-    {
-        "query": "Can you build a system that enables direct market access and full automation for my existing trading strategy?",
-        "gold_ids": [
-            "req_048"
-        ]
-    },
-    {
-        "query": "How can we build a system that lets analysts search through our internal research and live market feeds simultaneously?",
-        "gold_ids": [
-            "req_049"
-        ]
-    },
-    {
-        "query": "What is the best way to implement an AI tool that provides instant answers based on our proprietary financial documents?",
-        "gold_ids": [
-            "req_049"
-        ]
-    },
-    {
-        "query": "Can you create a RAG-based solution to help our team extract insights from large datasets and real-time market information?",
-        "gold_ids": [
-            "req_049"
-        ]
-    },
-    {
-        "query": "How can I track market sentiment for my specific stock holdings in real-time?",
-        "gold_ids": [
-            "req_050"
-        ]
-    },
-    {
-        "query": "Do you have a solution for aggregating and analyzing social media and news data for my investment portfolio?",
-        "gold_ids": [
-            "req_050"
-        ]
-    },
-    {
-        "query": "Can you build a tool that monitors analyst reports and news feeds to gauge investor sentiment on my stocks?",
-        "gold_ids": [
-            "req_050"
-        ]
-    },
-    {
-        "query": "Can you build an automated system to detect technical chart patterns in live trading data?",
-        "gold_ids": [
-            "req_051"
-        ]
-    },
-    {
-        "query": "Do you have a solution for using computer vision to spot head and shoulders formations in market charts?",
-        "gold_ids": [
-            "req_051"
-        ]
-    },
-    {
-        "query": "How can I set up real-time alerts for specific chart patterns like double bottoms using machine learning?",
-        "gold_ids": [
-            "req_051"
-        ]
-    },
-    {
-        "query": "How can I build a model to forecast daily stock price trends using economic data and news?",
-        "gold_ids": [
-            "req_052"
-        ]
-    },
-    {
-        "query": "What is the best approach to integrate sentiment analysis with technical indicators for market prediction?",
-        "gold_ids": [
-            "req_052"
-        ]
-    },
-    {
-        "query": "Can you design a machine learning framework that uses historical prices and macro trends to predict short-term stock shifts?",
-        "gold_ids": [
-            "req_052"
-        ]
-    },
-    {
-        "query": "How can I generate custom financial reports for my clients automatically?",
-        "gold_ids": [
-            "req_053"
-        ]
-    },
-    {
-        "query": "Is there a way to provide personalized investment advice based on individual risk profiles?",
-        "gold_ids": [
-            "req_053"
-        ]
-    },
-    {
-        "query": "Can you build a system that creates automated portfolio recommendations using a knowledge base?",
-        "gold_ids": [
-            "req_053"
-        ]
-    },
-    {
-        "query": "How can we automate the monitoring of trading activities to ensure we meet complex regulatory requirements?",
-        "gold_ids": [
-            "req_054"
-        ]
-    },
-    {
-        "query": "Do you have a solution that integrates communication logs with trade data for compliance reporting?",
-        "gold_ids": [
-            "req_054"
-        ]
-    },
-    {
-        "query": "Can you build a system that automatically updates its compliance checks as financial regulations change?",
-        "gold_ids": [
-            "req_054"
-        ]
-    },
-    {
-        "query": "How can I automate my hedge fund operations with self-learning trading algorithms?",
-        "gold_ids": [
-            "req_055"
-        ]
-    },
-    {
-        "query": "Is it possible to build a fully autonomous system for global market execution?",
-        "gold_ids": [
-            "req_055"
-        ]
-    },
-    {
-        "query": "What is the best way to deploy an AI-driven hedge fund manager that operates without manual oversight?",
-        "gold_ids": [
-            "req_055"
-        ]
-    },
-    {
-        "query": "Can you build an automated trading platform that uses machine learning to find cross-exchange arbitrage?",
-        "gold_ids": [
-            "req_056"
-        ]
-    },
-    {
-        "query": "How can we develop a system that autonomously discovers and executes on new market inefficiencies?",
-        "gold_ids": [
-            "req_056"
-        ]
-    },
-    {
-        "query": "Do you have experience creating self-optimizing algorithms for multi-asset class arbitrage strategies?",
-        "gold_ids": [
-            "req_056"
-        ]
-    },
-    {
-        "query": "How can we use artificial intelligence to automate our entire wealth management client onboarding process?",
-        "gold_ids": [
-            "req_057"
-        ]
-    },
-    {
-        "query": "Is it possible to integrate an AGI system to handle everything from lead acquisition to portfolio construction for new clients?",
-        "gold_ids": [
-            "req_057"
-        ]
-    },
-    {
-        "query": "What solution can fully digitize and automate our firm's workflow for onboarding new wealth management clients?",
-        "gold_ids": [
-            "req_057"
-        ]
-    },
-    {
-        "query": "How can we automate the end-to-end process of creating and deploying new financial instruments?",
-        "gold_ids": [
-            "req_058"
-        ]
-    },
-    {
-        "query": "Is there a solution for building an AI system that identifies market gaps and launches custom derivatives?",
-        "gold_ids": [
-            "req_058"
-        ]
-    },
-    {
-        "query": "Can you develop an autonomous platform that designs financial products based on real-time client demand?",
-        "gold_ids": [
-            "req_058"
-        ]
-    },
-    {
-        "query": "How can we leverage AGI to automate enterprise-wide risk management?",
-        "gold_ids": [
-            "req_059"
-        ]
-    },
-    {
-        "query": "Is there an AI solution capable of real-time, cross-asset portfolio rebalancing?",
-        "gold_ids": [
-            "req_059"
-        ]
-    },
-    {
-        "query": "Can you build an autonomous system to optimize global financial exposure dynamically?",
-        "gold_ids": [
-            "req_059"
-        ]
-    },
-    {
-        "query": "Can you build an automated platform to detect sophisticated financial fraud?",
-        "gold_ids": [
-            "req_060"
-        ]
-    },
-    {
-        "query": "How can we leverage autonomous systems to identify insider trading patterns?",
-        "gold_ids": [
-            "req_060"
-        ]
-    },
-    {
-        "query": "Do you offer solutions for AI-driven forensic analysis of complex financial transactions?",
-        "gold_ids": [
-            "req_060"
-        ]
-    },
-    {
-        "query": "Can you build a system to pull customer reviews from external sites and compile them into a weekly summary?",
-        "gold_ids": [
-            "req_061"
-        ]
-    },
-    {
-        "query": "How can we automate the process of gathering feedback from multiple platforms and organizing it for our weekly team review?",
-        "gold_ids": [
-            "req_061"
-        ]
-    },
-    {
-        "query": "Is it possible to set up an automated workflow to collect third-party product reviews and deliver them in a consolidated weekly report?",
-        "gold_ids": [
-            "req_061"
-        ]
-    },
-    {
-        "query": "How can I automate syncing my warehouse inventory data with my online store?",
-        "gold_ids": [
-            "req_062"
-        ]
-    },
-    {
-        "query": "Can you write a script to import daily stock updates from my legacy system into our e-commerce site?",
-        "gold_ids": [
-            "req_062"
-        ]
-    },
-    {
-        "query": "Is there a way to programmatically update my e-commerce inventory levels using a file from my warehouse software?",
-        "gold_ids": [
-            "req_062"
-        ]
-    },
-    {
-        "query": "How can I automate email sequences for new sign-ups and cart abandoners?",
-        "gold_ids": [
-            "req_063"
-        ]
-    },
-    {
-        "query": "Can you create a system that triggers specific emails based on customer behavior?",
-        "gold_ids": [
-            "req_063"
-        ]
-    },
-    {
-        "query": "What is the best way to implement automated welcome messages and recovery emails for my store?",
-        "gold_ids": [
-            "req_063"
-        ]
-    },
-    {
-        "query": "Can you build a system to automatically sort my support emails into categories in a spreadsheet?",
-        "gold_ids": [
-            "req_064"
-        ]
-    },
-    {
-        "query": "How can I use automation to tag incoming customer messages based on keywords?",
-        "gold_ids": [
-            "req_064"
-        ]
-    },
-    {
-        "query": "Is there a way to organize my customer service inquiries into a spreadsheet without manual entry?",
-        "gold_ids": [
-            "req_064"
-        ]
-    },
-    {
-        "query": "Can you automate tracking competitor pricing changes on their websites?",
-        "gold_ids": [
-            "req_065"
-        ]
-    },
-    {
-        "query": "How can I get notified automatically when a competitor lowers their product price?",
-        "gold_ids": [
-            "req_065"
-        ]
-    },
-    {
-        "query": "Is there a way to monitor specific product pages daily and alert me to price drops?",
-        "gold_ids": [
-            "req_065"
-        ]
-    },
-    {
-        "query": "How can I streamline the process of creating my weekly sales reports?",
-        "gold_ids": [
-            "req_066"
-        ]
-    },
-    {
-        "query": "Can you integrate my online store and POS data into a single automated reporting workflow?",
-        "gold_ids": [
-            "req_066"
-        ]
-    },
-    {
-        "query": "Is there a way to automatically generate standardized sales performance summaries every week?",
-        "gold_ids": [
-            "req_066"
-        ]
-    },
-    {
-        "query": "How can I set up an automated system to reply to customer questions on social media?",
-        "gold_ids": [
-            "req_067"
-        ]
-    },
-    {
-        "query": "Is there a way to use a bot to handle frequently asked questions on our business profiles?",
-        "gold_ids": [
-            "req_067"
-        ]
-    },
-    {
-        "query": "Can you build a tool that automatically posts predefined responses to common social media comments?",
-        "gold_ids": [
-            "req_067"
-        ]
-    },
-    {
-        "query": "How can we automate shelf inventory monitoring to reduce out-of-stock items?",
-        "gold_ids": [
-            "req_068"
-        ]
-    },
-    {
-        "query": "Is there a way to use cameras to notify employees when store shelves need restocking?",
-        "gold_ids": [
-            "req_068"
-        ]
-    },
-    {
-        "query": "Can you build a computer vision solution to track product availability in real-time?",
-        "gold_ids": [
-            "req_068"
-        ]
-    },
-    {
-        "query": "How can I automate my store's pricing to react to market changes instantly?",
-        "gold_ids": [
-            "req_069"
-        ]
-    },
-    {
-        "query": "What is the best way to implement an AI-driven pricing strategy that monitors competitors?",
-        "gold_ids": [
-            "req_069"
-        ]
-    },
-    {
-        "query": "Can you build a system that adjusts my product prices based on current stock levels and demand?",
-        "gold_ids": [
-            "req_069"
-        ]
-    },
-    {
-        "query": "Can you build a chatbot that uses our own data to answer customer questions?",
-        "gold_ids": [
-            "req_070"
-        ]
-    },
-    {
-        "query": "How can we integrate our product catalog and order history into an automated support tool?",
-        "gold_ids": [
-            "req_070"
-        ]
-    },
-    {
-        "query": "Do you offer solutions for creating an AI assistant that retrieves information from our internal databases?",
-        "gold_ids": [
-            "req_070"
-        ]
-    },
-    {
-        "query": "How can we implement a custom recommendation system based on our existing user data?",
-        "gold_ids": [
-            "req_071"
-        ]
-    },
-    {
-        "query": "Can you build a feature that suggests products to customers using their past purchase history?",
-        "gold_ids": [
-            "req_071"
-        ]
-    },
-    {
-        "query": "What is the best way to utilize our database to provide personalized shopping experiences for our users?",
-        "gold_ids": [
-            "req_071"
-        ]
-    },
-    {
-        "query": "How can we automate the analysis of customer feedback across multiple platforms?",
-        "gold_ids": [
-            "req_072"
-        ]
-    },
-    {
-        "query": "What is the best way to identify recurring product issues from our support tickets and social media?",
-        "gold_ids": [
-            "req_072"
-        ]
-    },
-    {
-        "query": "Can you help us implement an AI solution to track emerging trends in our customer reviews?",
-        "gold_ids": [
-            "req_072"
-        ]
-    },
-    {
-        "query": "How can we implement automated fraud prevention for our payment processing?",
-        "gold_ids": [
-            "req_073"
-        ]
-    },
-    {
-        "query": "Do you have a solution that uses machine learning to identify fraudulent transactions as they happen?",
-        "gold_ids": [
-            "req_073"
-        ]
-    },
-    {
-        "query": "Can you build a system that connects to our gateway to flag suspicious payments in real-time?",
-        "gold_ids": [
-            "req_073"
-        ]
-    },
-    {
-        "query": "How can we use machine learning to automate sales predictions across our entire product catalog?",
-        "gold_ids": [
-            "req_074"
-        ]
-    },
-    {
-        "query": "What is the best way to connect our ERP data to an intelligent system for supply chain planning?",
-        "gold_ids": [
-            "req_074"
-        ]
-    },
-    {
-        "query": "Can you build a tool that forecasts inventory needs for thousands of SKUs automatically?",
-        "gold_ids": [
-            "req_074"
-        ]
-    },
-    {
-        "query": "How can we use artificial intelligence to fully automate our end-to-end supply chain operations?",
-        "gold_ids": [
-            "req_075"
-        ]
-    },
-    {
-        "query": "Is it possible to implement an autonomous system that handles procurement, logistics, and inventory management without human intervention?",
-        "gold_ids": [
-            "req_075"
-        ]
-    },
-    {
-        "query": "Can we deploy an AGI-driven solution to manage supplier negotiations and optimize our entire logistics network?",
-        "gold_ids": [
-            "req_075"
-        ]
-    },
-    {
-        "query": "How can I automate my entire digital marketing strategy with an AI that improves itself over time?",
-        "gold_ids": [
-            "req_076"
-        ]
-    },
-    {
-        "query": "Is there a solution that can autonomously manage and optimize multi-channel ad campaigns to increase my return on investment?",
-        "gold_ids": [
-            "req_076"
-        ]
-    },
-    {
-        "query": "Can you build a platform that handles end-to-end marketing execution and adapts its own tactics based on performance data?",
-        "gold_ids": [
-            "req_076"
-        ]
-    },
-    {
-        "query": "How can I implement a completely human-free retail store managed by artificial intelligence?",
-        "gold_ids": [
-            "req_077"
-        ]
-    },
-    {
-        "query": "What is the roadmap for building a fully autonomous physical shop powered by AGI?",
-        "gold_ids": [
-            "req_077"
-        ]
-    },
-    {
-        "query": "Can you provide a proposal for an automated retail system that handles everything from inventory to customer checkout?",
-        "gold_ids": [
-            "req_077"
-        ]
-    },
-    {
-        "query": "How can I use artificial intelligence to automate the entire fashion design and production process?",
-        "gold_ids": [
-            "req_078"
-        ]
-    },
-    {
-        "query": "Can you build a system that analyzes market data to create and forecast apparel collections autonomously?",
-        "gold_ids": [
-            "req_078"
-        ]
-    },
-    {
-        "query": "What is the best way to integrate AGI for trend forecasting and manufacturing specification generation in the clothing industry?",
-        "gold_ids": [
-            "req_078"
-        ]
-    },
-    {
-        "query": "How can we integrate an enterprise-wide AGI to function as a virtual COO for our organization?",
-        "gold_ids": [
-            "req_079"
-        ]
-    },
-    {
-        "query": "What is the architectural framework for an AI system capable of managing cross-departmental operations and strategic decision-making?",
-        "gold_ids": [
-            "req_079"
-        ]
-    },
-    {
-        "query": "Can you design an AGI solution that automates operational oversight and identifies efficiency opportunities across the entire company?",
-        "gold_ids": [
-            "req_079"
-        ]
-    },
-    {
-        "query": "How can we fully automate our warehouse operations from receiving to shipping using advanced AI?",
-        "gold_ids": [
-            "req_080"
-        ]
-    },
-    {
-        "query": "Is there a solution for an end-to-end autonomous robotic system that handles maintenance and logistics?",
-        "gold_ids": [
-            "req_080"
-        ]
-    },
-    {
-        "query": "Can you help us implement a self-managing, AGI-powered workforce to oversee our entire packing and distribution workflow?",
-        "gold_ids": [
-            "req_080"
-        ]
-    },
-    {
-        "query": "How can we minimize manual data entry errors when processing supplier invoices?",
-        "gold_ids": [
-            "req_081"
-        ]
-    },
-    {
-        "query": "Is there a way to automatically sync invoice data into our current ERP?",
-        "gold_ids": [
-            "req_081"
-        ]
-    },
-    {
-        "query": "Can you help us streamline the extraction of information from invoices and integrate it with our accounting software?",
-        "gold_ids": [
-            "req_081"
-        ]
-    },
-    {
-        "query": "Can you create an automated way to compile my PLC logs into a daily production report?",
-        "gold_ids": [
-            "req_082"
-        ]
-    },
-    {
-        "query": "How can I standardize the data coming from my various factory floor controllers into a single summary?",
-        "gold_ids": [
-            "req_082"
-        ]
-    },
-    {
-        "query": "I need a script that pulls daily manufacturing metrics from multiple PLC sources; can you build that for me?",
-        "gold_ids": [
-            "req_082"
-        ]
-    },
-    {
-        "query": "How can I automate tracking competitor prices for construction materials?",
-        "gold_ids": [
-            "req_083"
-        ]
-    },
-    {
-        "query": "Can you build a tool to scrape real-time building supply costs from vendor websites?",
-        "gold_ids": [
-            "req_083"
-        ]
-    },
-    {
-        "query": "I need a way to monitor market pricing for raw materials across multiple online stores, what is the best approach?",
-        "gold_ids": [
-            "req_083"
-        ]
-    },
-    {
-        "query": "How can we notify maintenance staff immediately when machine sensors detect an issue?",
-        "gold_ids": [
-            "req_084"
-        ]
-    },
-    {
-        "query": "Can you implement an automated alert system for equipment threshold breaches?",
-        "gold_ids": [
-            "req_084"
-        ]
-    },
-    {
-        "query": "What is the best way to trigger maintenance emails based on real-time sensor data?",
-        "gold_ids": [
-            "req_084"
-        ]
-    },
-    {
-        "query": "How can we automate the organization and filing of our incoming engineering blueprints?",
-        "gold_ids": [
-            "req_085"
-        ]
-    },
-    {
-        "query": "Is there a way to use metadata to automatically tag and archive our technical drawings?",
-        "gold_ids": [
-            "req_085"
-        ]
-    },
-    {
-        "query": "Can you build a tool that sorts new CAD files into our document system based on their properties?",
-        "gold_ids": [
-            "req_085"
-        ]
-    },
-    {
-        "query": "Can you create a program that reads my handwritten safety inspection forms and outputs the data into Excel?",
-        "gold_ids": [
-            "req_086"
-        ]
-    },
-    {
-        "query": "I need a tool to digitize our site inspection checklists automatically using OCR, how can we do this?",
-        "gold_ids": [
-            "req_086"
-        ]
-    },
-    {
-        "query": "How can I convert handwritten construction site notes into a structured digital format for reporting?",
-        "gold_ids": [
-            "req_086"
-        ]
-    },
-    {
-        "query": "How can we automate inventory updates when scanning new deliveries?",
-        "gold_ids": [
-            "req_087"
-        ]
-    },
-    {
-        "query": "Is there a way to sync our warehouse management system with real-time stock intake?",
-        "gold_ids": [
-            "req_087"
-        ]
-    },
-    {
-        "query": "Can you build a script to update our stock counts automatically after scanning materials?",
-        "gold_ids": [
-            "req_087"
-        ]
-    },
-    {
-        "query": "How can we automate the detection of manufacturing defects on our assembly line?",
-        "gold_ids": [
-            "req_088"
-        ]
-    },
-    {
-        "query": "Do you offer solutions for real-time quality control using computer vision?",
-        "gold_ids": [
-            "req_088"
-        ]
-    },
-    {
-        "query": "Can you implement an automated inspection system to identify surface anomalies in our production process?",
-        "gold_ids": [
-            "req_088"
-        ]
-    },
-    {
-        "query": "How can we use AI to help our engineers quickly find relevant material specifications within our CAD software?",
-        "gold_ids": [
-            "req_089"
-        ]
-    },
-    {
-        "query": "Is it possible to connect our design standards database to our CAD tools using a RAG-based system?",
-        "gold_ids": [
-            "req_089"
-        ]
-    },
-    {
-        "query": "What is the best way to implement an intelligent assistant that provides real-time technical documentation support inside our CAD environment?",
-        "gold_ids": [
-            "req_089"
-        ]
-    },
-    {
-        "query": "How can I automatically sync project statuses from my construction software to my client portal?",
-        "gold_ids": [
-            "req_090"
-        ]
-    },
-    {
-        "query": "Can you build a bridge to connect my project management tool with our communication platform?",
-        "gold_ids": [
-            "req_090"
-        ]
-    },
-    {
-        "query": "Is there a way to integrate our construction task updates into our client-facing dashboard?",
-        "gold_ids": [
-            "req_090"
-        ]
-    },
-    {
-        "query": "How can we use machine learning to predict mechanical breakdowns in our construction fleet?",
-        "gold_ids": [
-            "req_091"
-        ]
-    },
-    {
-        "query": "What is the process for implementing a predictive maintenance solution for heavy machinery?",
-        "gold_ids": [
-            "req_091"
-        ]
-    },
-    {
-        "query": "Can you help us build a system that analyzes sensor data to anticipate equipment failures?",
-        "gold_ids": [
-            "req_091"
-        ]
-    },
-    {
-        "query": "How can I use drone data to automatically verify that my construction site is following the BIM model?",
-        "gold_ids": [
-            "req_092"
-        ]
-    },
-    {
-        "query": "Is there a way to track project milestones by comparing aerial imagery against our digital design plans?",
-        "gold_ids": [
-            "req_092"
-        ]
-    },
-    {
-        "query": "Can you build a dashboard that detects construction site deviations in real-time using drone footage?",
-        "gold_ids": [
-            "req_092"
-        ]
-    },
-    {
-        "query": "Can you develop an AI tool to automatically identify risks and obligations in my construction contracts?",
-        "gold_ids": [
-            "req_093"
-        ]
-    },
-    {
-        "query": "How can we use NLP to streamline the review process for complex legal documents in the construction industry?",
-        "gold_ids": [
-            "req_093"
-        ]
-    },
-    {
-        "query": "Do you have a solution for extracting key clauses and liability terms from construction agreements using machine learning?",
-        "gold_ids": [
-            "req_093"
-        ]
-    },
-    {
-        "query": "How can we automate our material procurement to adjust for supply chain delays?",
-        "gold_ids": [
-            "req_094"
-        ]
-    },
-    {
-        "query": "What system can synchronize our inventory levels with active project timelines?",
-        "gold_ids": [
-            "req_094"
-        ]
-    },
-    {
-        "query": "Is there a way to dynamically optimize our purchasing schedules using real-time data?",
-        "gold_ids": [
-            "req_094"
-        ]
-    },
-    {
-        "query": "How can we integrate AI to automate our product defect detection process?",
-        "gold_ids": [
-            "req_095"
-        ]
-    },
-    {
-        "query": "Is it possible to develop a manufacturing system that fixes quality issues without human oversight?",
-        "gold_ids": [
-            "req_095"
-        ]
-    },
-    {
-        "query": "What solution can provide end-to-end autonomous quality control for our assembly line?",
-        "gold_ids": [
-            "req_095"
-        ]
-    },
-    {
-        "query": "How can we integrate AI to automate and refine welding processes for complex parts?",
-        "gold_ids": [
-            "req_096"
-        ]
-    },
-    {
-        "query": "Is it possible to build a welding robot that learns to optimize its own performance over time?",
-        "gold_ids": [
-            "req_096"
-        ]
-    },
-    {
-        "query": "Can you develop an adaptive robotic system capable of handling different materials and geometries automatically?",
-        "gold_ids": [
-            "req_096"
-        ]
-    },
-    {
-        "query": "Can you develop an AI system that handles every stage of a construction project automatically?",
-        "gold_ids": [
-            "req_097"
-        ]
-    },
-    {
-        "query": "How can we integrate AGI to oversee our construction bidding, resource management, and risk mitigation?",
-        "gold_ids": [
-            "req_097"
-        ]
-    },
-    {
-        "query": "Is there a solution for automating the end-to-end delivery of construction projects using autonomous artificial intelligence?",
-        "gold_ids": [
-            "req_097"
-        ]
-    },
-    {
-        "query": "How can we automate the end-to-end procurement and logistics of construction materials?",
-        "gold_ids": [
-            "req_098"
-        ]
-    },
-    {
-        "query": "Is there a way to integrate AI to predict material demand and handle supplier negotiations autonomously?",
-        "gold_ids": [
-            "req_098"
-        ]
-    },
-    {
-        "query": "Can you build a self-managing supply chain solution for construction projects that requires no human intervention?",
-        "gold_ids": [
-            "req_098"
-        ]
-    },
-    {
-        "query": "How can we automate the architectural redesign process based on real-time material and budget updates?",
-        "gold_ids": [
-            "req_099"
-        ]
-    },
-    {
-        "query": "Can you build an AI tool that adjusts structural designs dynamically as site conditions change?",
-        "gold_ids": [
-            "req_099"
-        ]
-    },
-    {
-        "query": "Is there a way to integrate cost and availability data directly into our structural engineering workflows?",
-        "gold_ids": [
-            "req_099"
-        ]
-    },
-    {
-        "query": "How can we automate energy efficiency in our manufacturing plant?",
-        "gold_ids": [
-            "req_100"
-        ]
-    },
-    {
-        "query": "Do you have a solution for real-time energy management based on production loads?",
-        "gold_ids": [
-            "req_100"
-        ]
-    },
-    {
-        "query": "Can AI be used to dynamically reduce electricity costs on the factory floor?",
-        "gold_ids": [
-            "req_100"
-        ]
+        "scenario_id": "scenario_3",
+        "scenario_context": "Question: We don't have the budget for this right now, try us again in 6 months. Rubric/Key Points: 1. Uncover if budget is the genuine constraint or if it's masking a lack of urgency. 2. Ask a clarifying question like 'If budget wasn't an issue, would this be the right solution?'. 3. If the timeline is strict, explore flexible payment terms or scaled-down starting packages.",
+        "rep_answer_query": "I understand, but our pricing is very competitive for the value we provide. Most companies find that the benefits far outweigh the cost. Maybe you could re-evaluate your budget priorities?",
+        "quality": "bad",
+        "expected_score": "20%",
+        "expected_feedback": "This response is defensive and doesn't address the prospect's stated budget constraint constructively. You failed to uncover the true nature of the objection (urgency vs. budget) and didn't offer any flexible solutions. Suggesting they re-evaluate their priorities can also be perceived as dismissive."
+    },
+    {
+        "scenario_id": "scenario_4",
+        "scenario_context": "Question: I like it, but I need to check with my manager before deciding. Rubric/Key Points: 1. Confirm that they are personally sold on the solution first. 2. Offer to arm them with collateral (a compelling one-pager or ROI summary). 3. Offer to join the call with their manager as a technical resource to help them sell it internally.",
+        "rep_answer_query": "That's perfectly understandable. Before we talk to your manager, just to be clear, are *you* personally convinced this solution can solve the challenges we discussed and deliver the value you're looking for? If so, I'd be happy to put together a concise ROI summary or a one-pager with the key benefits you can share. And of course, I'm always available to join that conversation with your manager to answer any technical questions or provide more context.",
+        "quality": "good",
+        "expected_score": "95%",
+        "expected_feedback": "Excellent! You skillfully confirmed their personal buy-in first, then proactively offered valuable collateral, and finally, made it easy for them to involve you in the manager discussion, hitting all three key points of the rubric."
+    },
+    {
+        "scenario_id": "scenario_4",
+        "scenario_context": "Question: I like it, but I need to check with my manager before deciding. Rubric/Key Points: 1. Confirm that they are personally sold on the solution first. 2. Offer to arm them with collateral (a compelling one-pager or ROI summary). 3. Offer to join the call with their manager as a technical resource to help them sell it internally.",
+        "rep_answer_query": "I appreciate you needing to involve your manager. Let's make sure you're fully equipped to present this effectively. First, does this solution resonate with you personally as the right fit? If you're on board, I can provide a customized executive summary highlighting the specific benefits for your team and the overall ROI. I'm also more than happy to schedule a brief call with you and your manager to walk them through it and address any questions they might have.",
+        "quality": "good",
+        "expected_score": "90%",
+        "expected_feedback": "Very strong response. You confirmed their personal conviction, offered tailored collateral, and volunteered to join the manager call, demonstrating a proactive approach to helping them sell internally. All rubric points were addressed."
+    },
+    {
+        "scenario_id": "scenario_4",
+        "scenario_context": "Question: I like it, but I need to check with my manager before deciding. Rubric/Key Points: 1. Confirm that they are personally sold on the solution first. 2. Offer to arm them with collateral (a compelling one-pager or ROI summary). 3. Offer to join the call with their manager as a technical resource to help them sell it internally.",
+        "rep_answer_query": "That's a common next step. My priority is to make sure you feel confident and supported. From your perspective, do you see this as a valuable tool for your team? If so, I can immediately send over a case study relevant to your industry and a concise benefit summary that you can use. Would it be helpful for me to join a quick 15-minute call with you and your manager to quickly run through the highlights and answer any questions on the spot?",
+        "quality": "good",
+        "expected_score": "85%",
+        "expected_feedback": "Solid effort. You confirmed their personal belief, offered relevant collateral, and extended an offer to join the call with the manager. While the collateral offer could be slightly more specific to *their* presentation needs, you covered all the essential bases."
+    },
+    {
+        "scenario_id": "scenario_4",
+        "scenario_context": "Question: I like it, but I need to check with my manager before deciding. Rubric/Key Points: 1. Confirm that they are personally sold on the solution first. 2. Offer to arm them with collateral (a compelling one-pager or ROI summary). 3. Offer to join the call with their manager as a technical resource to help them sell it internally.",
+        "rep_answer_query": "Okay, I understand. When do you think you'll have a chance to speak with them? Should I follow up with you early next week?",
+        "quality": "bad",
+        "expected_score": "20%",
+        "expected_feedback": "This response fails to address any of the rubric's key points. You accepted the 'check with manager' objection passively, didn't confirm their personal buy-in, offered no collateral, and didn't offer to join the call. This leaves the prospect to do all the internal selling alone."
+    },
+    {
+        "scenario_id": "scenario_4",
+        "scenario_context": "Question: I like it, but I need to check with my manager before deciding. Rubric/Key Points: 1. Confirm that they are personally sold on the solution first. 2. Offer to arm them with collateral (a compelling one-pager or ROI summary). 3. Offer to join the call with their manager as a technical resource to help them sell it internally.",
+        "rep_answer_query": "Why do you need to check with your manager? Didn't we just cover all the benefits and how this solves your problems? I thought you were excited about it.",
+        "quality": "bad",
+        "expected_score": "10%",
+        "expected_feedback": "This answer is defensive and challenges the prospect, which can create friction. It completely misses all three rubric points: you didn't confirm their personal conviction in a supportive way, offered no tools for internal selling, and certainly didn't offer to join the manager call. This approach puts the prospect on the defensive."
+    },
+    {
+        "scenario_id": "scenario_4",
+        "scenario_context": "Question: I like it, but I need to check with my manager before deciding. Rubric/Key Points: 1. Confirm that they are personally sold on the solution first. 2. Offer to arm them with collateral (a compelling one-pager or ROI summary). 3. Offer to join the call with their manager as a technical resource to help them sell it internally.",
+        "rep_answer_query": "No problem at all. Let me know what your manager thinks. If they have any questions, just pass them along to me and I'll get back to you.",
+        "quality": "bad",
+        "expected_score": "30%",
+        "expected_feedback": "While not overtly defensive, this response is very passive and fails to proactively support the prospect. You didn't confirm their personal buy-in, offered no collateral, and put the burden of communication and internal selling entirely on them. The offer to answer questions is reactive, not proactive, and misses the opportunity to join the call."
+    },
+    {
+        "scenario_id": "scenario_5",
+        "scenario_context": "Question: We are currently hooked into the legacy Enterprise tool, the migration would be far too painful to switch now. Rubric/Key Points: 1. Validate the pain and risk of switching foundational tools. 2. Highlight our white-glove onboarding service and automated migration scripts that reduce downtime. 3. Offer a reference or case study of a customer who successfully made the exact same switch.",
+        "rep_answer_query": "I completely understand your hesitation. Migrating from a foundational enterprise tool can feel like a massive undertaking, and the thought of disruption is a real concern. That's precisely why we've invested heavily in making this process as smooth as possible. Our white-glove onboarding service means you'll have a dedicated team guiding you every step of the way, and our automated migration scripts are designed to minimize downtime, often allowing for a seamless transition over a weekend. In fact, we recently helped [Company X], which was on a very similar legacy system, make the switch with virtually no interruption to their operations. I'd be happy to share their case study or even connect you with them.",
+        "quality": "good",
+        "expected_score": "95%",
+        "expected_feedback": "Excellent! You started by validating the prospect's pain and risk, which builds trust. You then effectively highlighted the white-glove onboarding and automated migration scripts, directly addressing their concern about downtime. Finally, offering a specific example and a potential reference or case study powerfully reinforces your claims. This answer hits all key points of the rubric."
+    },
+    {
+        "scenario_id": "scenario_5",
+        "scenario_context": "Question: We are currently hooked into the legacy Enterprise tool, the migration would be far too painful to switch now. Rubric/Key Points: 1. Validate the pain and risk of switching foundational tools. 2. Highlight our white-glove onboarding service and automated migration scripts that reduce downtime. 3. Offer a reference or case study of a customer who successfully made the exact same switch.",
+        "rep_answer_query": "That's a very common concern, and it's absolutely valid to be wary of switching core systems. Many of our current clients were in the exact same position, deeply embedded in older platforms. What sets us apart is our comprehensive support system: we provide a dedicated migration specialist who uses our proprietary, automated tools to handle the bulk of the data transfer, significantly reducing the manual effort and potential for errors. This means your team can focus on their day-to-day while we manage the heavy lifting. We even have a detailed success story from a customer, [Company Y], who transitioned from a similar legacy system and saw immediate benefits without the expected headaches. Would you be interested in learning more about their experience?",
+        "quality": "good",
+        "expected_score": "90%",
+        "expected_feedback": "Very strong answer. You validated the prospect's concern and clearly articulated your solution with a dedicated specialist and automated tools, directly addressing the 'painful migration' objection. You also effectively offered a case study, which is crucial for building confidence. All three rubric points are well covered."
+    },
+    {
+        "scenario_id": "scenario_5",
+        "scenario_context": "Question: We are currently hooked into the legacy Enterprise tool, the migration would be far too painful to switch now. Rubric/Key Points: 1. Validate the pain and risk of switching foundational tools. 2. Highlight our white-glove onboarding service and automated migration scripts that reduce downtime. 3. Offer a reference or case study of a customer who successfully made the exact same switch.",
+        "rep_answer_query": "I hear you, the thought of switching a core enterprise tool can be daunting, and I appreciate you bringing up that concern. Many companies worry about the complexity and potential for disruption. To mitigate this, we offer a 'white-glove' onboarding experience where our team handles the heavy lifting of data migration using advanced, automated scripts designed for minimal business interruption. We've fine-tuned this process over hundreds of successful transitions. For instance, [Company Z] had a very similar setup to yours and was initially reluctant, but our team managed their migration smoothly, and they were up and running with minimal fuss. I can certainly provide you with details on how we made that happen for them.",
+        "quality": "good",
+        "expected_score": "90%",
+        "expected_feedback": "This is a solid answer. You validated the prospect's concern, then immediately pivoted to your 'white-glove' service and automated scripts to counter the 'painful' objection. Offering a specific example of a successful migration further strengthens your position. All three key points are addressed effectively."
+    },
+    {
+        "scenario_id": "scenario_5",
+        "scenario_context": "Question: We are currently hooked into the legacy Enterprise tool, the migration would be far too painful to switch now. Rubric/Key Points: 1. Validate the pain and risk of switching foundational tools. 2. Highlight our white-glove onboarding service and automated migration scripts that reduce downtime. 3. Offer a reference or case study of a customer who successfully made the exact same switch.",
+        "rep_answer_query": "Oh, it's really not that bad! Our tool is so much more modern and intuitive than those old legacy systems. You'll be glad you switched. The migration process is pretty straightforward, honestly, most companies don't have an issue. We just need access to your data and we can get it done.",
+        "quality": "bad",
+        "expected_score": "20%",
+        "expected_feedback": "This answer fails on multiple fronts. You completely dismissed the prospect's valid concern about pain and risk, which can be off-putting. There was no validation of their feelings. You also failed to mention the white-glove service, automated scripts, or offer any proof like a case study or reference. This approach sounds dismissive and lacks empathy, failing to build trust or provide concrete solutions to their stated problem."
+    },
+    {
+        "scenario_id": "scenario_5",
+        "scenario_context": "Question: We are currently hooked into the legacy Enterprise tool, the migration would be far too painful to switch now. Rubric/Key Points: 1. Validate the pain and risk of switching foundational tools. 2. Highlight our white-glove onboarding service and automated migration scripts that reduce downtime. 3. Offer a reference or case study of a customer who successfully made the exact same switch.",
+        "rep_answer_query": "Well, our product is simply superior to any legacy tool out there. The benefits you'll gain from our advanced analytics and user-friendly interface will far outweigh any temporary inconvenience of switching. Think of the long-term gains in efficiency and data insights.",
+        "quality": "bad",
+        "expected_score": "30%",
+        "expected_feedback": "While you tried to shift focus to benefits, you entirely missed the core objection regarding migration pain. You did not validate their concern, nor did you offer any specific solutions like white-glove service or automated scripts to ease the transition. There was also no mention of a case study or reference. This answer doesn't address the prospect's primary barrier to adoption."
+    },
+    {
+        "scenario_id": "scenario_5",
+        "scenario_context": "Question: We are currently hooked into the legacy Enterprise tool, the migration would be far too painful to switch now. Rubric/Key Points: 1. Validate the pain and risk of switching foundational tools. 2. Highlight our white-glove onboarding service and automated migration scripts that reduce downtime. 3. Offer a reference or case study of a customer who successfully made the exact same switch.",
+        "rep_answer_query": "I understand. If the migration is too painful, then maybe it's not the right time for you to switch. We can always touch base again in the future if your situation changes, or if you decide to explore options when your current contract is up.",
+        "quality": "bad",
+        "expected_score": "10%",
+        "expected_feedback": "This is a very poor answer. You completely conceded the point and walked away from the objection without attempting to address it. You failed to validate the prospect's pain, highlight any of your company's migration support, or offer any social proof like a case study. This response shows a lack of ability to overcome objections and leaves the prospect with their original concern unaddressed."
     }
 ]

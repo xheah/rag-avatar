@@ -1,0 +1,27 @@
+[
+  {
+    "id": "scenario_1",
+    "document": "Question: Your product is too expensive, similar solutions cost half as much. Rubric/Key Points: 1. Acknowledge and validate the objection. 2. Shift the focus from strictly price to long-term value and ROI. 3. Mention our superior customer support, ease of integration, and higher uptime guarantees. 4. Avoid simply offering a discount immediately.",
+    "metadata": {"type": "sales_scenario"}
+  },
+  {
+    "id": "scenario_2",
+    "document": "Question: How does your product differ from Competitor X? Rubric/Key Points: 1. Avoid bashing the competitor directly or being defensive. 2. Highlight our unique features: native API, built-in advanced analytics, and enterprise-grade security. 3. Pinpoint how these specific features directly solve the prospect's unique pain point.",
+    "metadata": {"type": "sales_scenario"}
+  },
+  {
+    "id": "scenario_3",
+    "document": "Question: We don't have the budget for this right now, try us again in 6 months. Rubric/Key Points: 1. Uncover if budget is the genuine constraint or if it's masking a lack of urgency. 2. Ask a clarifying question like 'If budget wasn't an issue, would this be the right solution?'. 3. If the timeline is strict, explore flexible payment terms or scaled-down starting packages.",
+    "metadata": {"type": "sales_scenario"}
+  },
+  {
+    "id": "scenario_4",
+    "document": "Question: I like it, but I need to check with my manager before deciding. Rubric/Key Points: 1. Confirm that they are personally sold on the solution first. 2. Offer to arm them with collateral (a compelling one-pager or ROI summary). 3. Offer to join the call with their manager as a technical resource to help them sell it internally.",
+    "metadata": {"type": "sales_scenario"}
+  },
+  {
+    "id": "scenario_5",
+    "document": "Question: We are currently hooked into the legacy Enterprise tool, the migration would be far too painful to switch now. Rubric/Key Points: 1. Validate the pain and risk of switching foundational tools. 2. Highlight our white-glove onboarding service and automated migration scripts that reduce downtime. 3. Offer a reference or case study of a customer who successfully made the exact same switch.",
+    "metadata": {"type": "sales_scenario"}
+  }
+]

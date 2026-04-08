@@ -9,18 +9,18 @@ from src.config import get_db_client, get_embedding_model
 def initialize_database():
     """Checks if the active vector database is populated. If not, it populates it."""
     client = get_db_client()
-    collection = client.get_or_create_collection(name="collection_minilm_finetuned")
+    collection = client.get_or_create_collection(name="collection_sales_scenarios")
 
     # Check if the database has items in it
     if collection.count() > 0:
-        print(f"Database 'collection_minilm_finetuned' already populated with {collection.count()} item(s).")
+        print(f"Database 'collection_sales_scenarios' already populated with {collection.count()} item(s).")
         return
 
     print("Database is empty! Reading json source and generating embeddings... This may take a minute.")
 
     # Get data
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    data_path = os.path.join(base_dir, "data", "true_synthetic_requests.json")
+    data_path = os.path.join(base_dir, "data", "sales_scenarios.json")
     
     with open(data_path, "r") as f:
         data = json.load(f)

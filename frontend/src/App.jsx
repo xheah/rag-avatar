@@ -3,7 +3,7 @@ import { Send, Mic, Trash2, Loader2, BrainCircuit, Upload } from 'lucide-react';
 
 function App() {
   const [messages, setMessages] = useState([
-    { role: 'avatar', content: 'Hello there! I am your AI Agency Avatar. How can I assist you with your integration projects today?', thoughts: null }
+    { role: 'avatar', content: "Welcome to your Sales Training Simulator! I'm your Senior Sales Director. When you're ready, say 'Start Quiz' to receive your first scenario.", thoughts: null }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [orbState, setOrbState] = useState('idle'); // idle, thinking, speaking
