@@ -67,7 +67,6 @@ async def chat_stream_generator(user_query: str, session_id: str):
 
     # Latency tracking inside the orchestrator
     timestamps = {
-        "t_routed": None,
         "t_first_token": None,
         "t_llm_done": None,
         "t_first_audio": None
@@ -75,10 +74,6 @@ async def chat_stream_generator(user_query: str, session_id: str):
 
     async def orchestrate():
         try:
-            route = adaptive_router(chat_history=chat_history, latest_user_query=user_query)
-            timestamps["t_routed"] = time.perf_counter()
-            await output_queue.put(f"data: {json.dumps({'type': 'route', 'route': route})}\n\n")
-
             full_response = ""
 
             cartesia_ws = None
@@ -88,7 +83,7 @@ async def chat_stream_generator(user_query: str, session_id: str):
             if cartesia_api_key:
                 try:
                     cartesia_ws = await websockets.connect(
-                        f"wss://api.cartesia.ai/tts/websocket?api_key={cartesia_api_key}&cartesia_version=2024-06-10"
+                        f"wss://api.cartesia.ai/tts/websocket?api_key={cartesia_api_key}&cartesia_version=2026-03-01"
                     )
                 except Exception as e:
                     print(f"Cartesia WebSocket Connection failed: {e}")
@@ -117,19 +112,16 @@ async def chat_stream_generator(user_query: str, session_id: str):
 
             # Stream text from LLM
             speech_buffer = ""
-            in_speech = (route == "CHAT") # Chat doesn't use thought tags, it's all speech
             
             # We pick the generator
-            if route == "CHAT":
-                llm_stream = generate_chat_response_stream(user_query=user_query, chat_history=chat_history)
-            else:
-                try:
-                    retrieved = get_closest_matches(user_query=user_query, k=5)
-                except Exception as re:
-                    print(f"Retriever Error: {re}")
-                    retrieved = []
-                llm_stream = generate_rag_response_v4_stream(user_query=user_query, retrieved_documents=retrieved, chat_history=chat_history)
 
+            try:
+                retrieved = get_closest_matches(user_query=user_query, k=5)
+            except Exception as re:
+                print(f"Retriever Error: {re}")
+                retrieved = []
+            llm_stream = generate_rag_response_v4_stream(user_query=user_query, retrieved_documents=retrieved, chat_history=chat_history)
+            print(llm_stream)
             async for chunk in llm_stream:
                 if timestamps["t_first_token"] is None:
                     timestamps["t_first_token"] = time.perf_counter()
@@ -138,26 +130,10 @@ async def chat_stream_generator(user_query: str, session_id: str):
                 await output_queue.put(f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n")
 
                 if cartesia_ws:
-                    if route == "RAG":
-                        # RAG uses <thought> ... </thought> <speech> ... </speech>
-                        # We only want to TTS the text inside <speech>
-                        if not in_speech:
-                            if "<speech>" in full_response.lower():
-                                in_speech = True
-                                # Add everything after <speech> to buffer
-                                speech_buffer += full_response.lower().split("<speech>")[-1]
-                        else:
-                            if "</speech>" in chunk.lower():
-                                in_speech = False
-                                before_tag = chunk.lower().split("</speech>")[0]
-                                speech_buffer += before_tag
-                            else:
-                                speech_buffer += chunk
-                    else:
-                        speech_buffer += chunk
+                    speech_buffer += chunk
 
                     # If we have gathered enough words, flush to Cartesia
-                    if in_speech and len(speech_buffer.split(" ")) >= 4:
+                    if len(speech_buffer.split(" ")) >= 4:
                         words = speech_buffer.split(" ")
                         to_send = " ".join(words[:-1]) + " "
                         speech_buffer = words[-1] # Carry over the latest word
@@ -168,7 +144,7 @@ async def chat_stream_generator(user_query: str, session_id: str):
                             "transcript": to_send,
                             "voice": {
                                 "mode": "id",
-                                "id": "e07c00bc-4134-4eae-9ea4-1a55fb45746b"
+                                "id": "5ee9feff-1265-424a-9d7f-8e4d431a12c7"
                             },
                             "output_format": {
                                 "container": "raw",
@@ -203,7 +179,7 @@ async def chat_stream_generator(user_query: str, session_id: str):
                 }
                 try:
                     await cartesia_ws.send(json.dumps(req))
-                    await asyncio.wait_for(receiver_task, timeout=5.0)
+                    await asyncio.wait_for(receiver_task, timeout=30.0)
                 except Exception as ce:
                      pass
                 finally:
@@ -211,8 +187,7 @@ async def chat_stream_generator(user_query: str, session_id: str):
 
             # Save chat history
             import re
-            speech_match = re.search(r"<speech>(.*?)</speech>", full_response, re.DOTALL | re.IGNORECASE)
-            final_answer = speech_match.group(1).strip() if speech_match else full_response
+            final_answer = full_response
             sessions[session_id] += f"User: {user_query}\nAvatar: {final_answer}\n"
 
         except Exception as e:
@@ -238,12 +213,10 @@ async def chat_stream_generator(user_query: str, session_id: str):
     print("\n" + "─" * 52)
     print(f"  LATENCY REPORT  │  query: \"{user_query[:40]}\"")
     print("─" * 52)
-    print(f"  Router          │ {ms(t0, timestamps['t_routed'])}")
     print(f"  First LLM token │ {ms(t0, timestamps['t_first_token'])}")
     print(f"  Full LLM done   │ {ms(t0, timestamps['t_llm_done'])}")
     print(f"  First audio out │ {ms(t0, timestamps['t_first_audio'])}  ◄ end-to-end")
     print("─" * 52)
-    print(f"  (LLM generation took {ms(timestamps.get('t_routed') or 0, timestamps.get('t_llm_done'))})")
     if timestamps['t_first_audio']:
         print(f"  (Cartesia TTS   took {ms(timestamps.get('t_first_token') or 0, timestamps.get('t_first_audio'))})")
     print("─" * 52 + "\n")

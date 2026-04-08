@@ -17,7 +17,7 @@ OLLAMA_MODEL = "aisingapore/Gemma-SEA-LION-v3-9B-IT:q4_k_m"
 # qwen3 outputs tokens to message.thinking (not message.content) when think=True.
 # Passing think=False fixes this. Other models don't support the think param at all,
 # so we only inject it for qwen3 to avoid crashing.
-OLLAMA_THINK_KWARGS: dict = {"think": False} if OLLAMA_MODEL.startswith("qwen3") else {"think": True}
+OLLAMA_THINK_KWARGS: dict = {"think": False} if OLLAMA_MODEL.startswith("qwen3") else {}
 
 
 # Create global singletons so they only load ONCE
