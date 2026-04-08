@@ -133,7 +133,7 @@ async def chat_stream_generator(user_query: str, session_id: str):
                     speech_buffer += chunk
 
                     # If we have gathered enough words, flush to Cartesia
-                    if len(speech_buffer.split(" ")) >= 4:
+                    if len(speech_buffer.split(" ")) >= 1:
                         words = speech_buffer.split(" ")
                         to_send = " ".join(words[:-1]) + " "
                         speech_buffer = words[-1] # Carry over the latest word
