@@ -53,51 +53,143 @@ async def get_index():
         return f.read()
 
 async def chat_stream_generator(user_query: str, session_id: str):
+    import time
+    import uuid
+    import asyncio
+    t0 = time.perf_counter()
+
     if session_id not in sessions:
         sessions[session_id] = ""
     chat_history = sessions[session_id]
-    
-    try:
-        route = adaptive_router(chat_history=chat_history, latest_user_query=user_query)
-        yield f"data: {json.dumps({'type': 'route', 'route': route})}\n\n"
-        
-        full_response = ""
-        
-        if route == "CHAT":
-            for chunk in generate_chat_response_stream(user_query=user_query, chat_history=chat_history):
-                full_response += chunk
-                yield f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n"
-        else: # RAG
-            try:
-                retrieved = get_closest_matches(user_query=user_query, k=5)
-            except Exception as re:
-                print(f"Retriever Error: {re}")
-                retrieved = []
+
+    cartesia_api_key = os.getenv("CARTESIA_API_KEY")
+    output_queue = asyncio.Queue()
+
+    # Latency tracking inside the orchestrator
+    timestamps = {
+        "t_routed": None,
+        "t_first_token": None,
+        "t_llm_done": None,
+        "t_first_audio": None
+    }
+
+    async def orchestrate():
+        try:
+            route = adaptive_router(chat_history=chat_history, latest_user_query=user_query)
+            timestamps["t_routed"] = time.perf_counter()
+            await output_queue.put(f"data: {json.dumps({'type': 'route', 'route': route})}\n\n")
+
+            full_response = ""
+
+            cartesia_ws = None
+            context_id = str(uuid.uuid4())
             
-            for chunk in generate_rag_response_v4_stream(user_query=user_query, retrieved_documents=retrieved, chat_history=chat_history):
-                full_response += chunk
-                yield f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n"
+            # Setup websocket manually if key logic passes
+            if cartesia_api_key:
+                try:
+                    cartesia_ws = await websockets.connect(
+                        f"wss://api.cartesia.ai/tts/websocket?api_key={cartesia_api_key}&cartesia_version=2024-06-10"
+                    )
+                except Exception as e:
+                    print(f"Cartesia WebSocket Connection failed: {e}")
+                    cartesia_ws = None
+
+            async def cartesia_receiver():
+                if not cartesia_ws:
+                    return
+                try:
+                    async for msg in cartesia_ws:
+                        if type(msg) == str:
+                            data = json.loads(msg)
+                            if data.get("type") == "done":
+                                break
+                            elif data.get("type") == "chunk" and "data" in data:
+                                if timestamps["t_first_audio"] is None:
+                                    timestamps["t_first_audio"] = time.perf_counter()
+                                await output_queue.put(f"data: {json.dumps({'type': 'audio_chunk', 'content': data['data']})}\n\n")
+                            elif data.get("type") == "error":
+                                print(f"Cartesia Error: {data.get('error')}")
+                except Exception as e:
+                    print(f"Cartesia receiver error: {e}")
+
+            # Start Cartesia receiver
+            receiver_task = asyncio.create_task(cartesia_receiver()) if cartesia_ws else None
+
+            # Stream text from LLM
+            speech_buffer = ""
+            in_speech = (route == "CHAT") # Chat doesn't use thought tags, it's all speech
+            
+            # We pick the generator
+            if route == "CHAT":
+                llm_stream = generate_chat_response_stream(user_query=user_query, chat_history=chat_history)
+            else:
+                try:
+                    retrieved = get_closest_matches(user_query=user_query, k=5)
+                except Exception as re:
+                    print(f"Retriever Error: {re}")
+                    retrieved = []
+                llm_stream = generate_rag_response_v4_stream(user_query=user_query, retrieved_documents=retrieved, chat_history=chat_history)
+
+            async for chunk in llm_stream:
+                if timestamps["t_first_token"] is None:
+                    timestamps["t_first_token"] = time.perf_counter()
                 
-        import re
-        speech_match = re.search(r"<speech>(.*?)</speech>", full_response, re.DOTALL | re.IGNORECASE)
-        final_answer = speech_match.group(1).strip() if speech_match else full_response
-        sessions[session_id] += f"User: {user_query}\nAvatar: {final_answer}\n"
-        
-        cartesia_api_key = os.getenv("CARTESIA_API_KEY")
-        print(f"DEBUG: Trying Cartesia. Found API Key: {bool(cartesia_api_key)}, Text Length: {len(final_answer)}")
-        
-        if cartesia_api_key and final_answer:
-            try:
-                import requests
-                url = "https://api.cartesia.ai/tts/sse"
-                headers = {
-                    "X-API-Key": cartesia_api_key,
-                    "Cartesia-Version": "2024-06-10",
-                    "Content-Type": "application/json"
-                }
-                data = {
+                full_response += chunk
+                await output_queue.put(f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n")
+
+                if cartesia_ws:
+                    if route == "RAG":
+                        # RAG uses <thought> ... </thought> <speech> ... </speech>
+                        # We only want to TTS the text inside <speech>
+                        if not in_speech:
+                            if "<speech>" in full_response.lower():
+                                in_speech = True
+                                # Add everything after <speech> to buffer
+                                speech_buffer += full_response.lower().split("<speech>")[-1]
+                        else:
+                            if "</speech>" in chunk.lower():
+                                in_speech = False
+                                before_tag = chunk.lower().split("</speech>")[0]
+                                speech_buffer += before_tag
+                            else:
+                                speech_buffer += chunk
+                    else:
+                        speech_buffer += chunk
+
+                    # If we have gathered enough words, flush to Cartesia
+                    if in_speech and len(speech_buffer.split(" ")) >= 4:
+                        words = speech_buffer.split(" ")
+                        to_send = " ".join(words[:-1]) + " "
+                        speech_buffer = words[-1] # Carry over the latest word
+                        
+                        req = {
+                            "context_id": context_id,
+                            "model_id": "sonic-turbo",
+                            "transcript": to_send,
+                            "voice": {
+                                "mode": "id",
+                                "id": "e07c00bc-4134-4eae-9ea4-1a55fb45746b"
+                            },
+                            "output_format": {
+                                "container": "raw",
+                                "encoding": "pcm_f32le",
+                                "sample_rate": 44100
+                            },
+                            "continue": True
+                        }
+                        try:
+                            await cartesia_ws.send(json.dumps(req))
+                        except Exception as ce:
+                            print(f"Cartesia send error: {ce}")
+
+            timestamps["t_llm_done"] = time.perf_counter()
+
+            # Flush the rest of the buffer and close stream
+            if cartesia_ws:
+                req = {
+                    "context_id": context_id,
                     "model_id": "sonic-english",
-                    "transcript": final_answer,
+                    "transcript": speech_buffer,
                     "voice": {
                         "mode": "id",
                         "id": "9626c31c-bec5-4cca-baa8-f8ba9e84c8bc"
@@ -106,33 +198,55 @@ async def chat_stream_generator(user_query: str, session_id: str):
                         "container": "raw",
                         "encoding": "pcm_f32le",
                         "sample_rate": 44100
-                    }
+                    },
+                    "continue": False
                 }
-                with requests.post(url, headers=headers, json=data, stream=True) as response:
-                    print(f"DEBUG: Cartesia SSE API Response Status: {response.status_code}")
-                    if response.status_code == 200:
-                        for line in response.iter_lines():
-                            if line:
-                                decoded = line.decode('utf-8')
-                                if decoded.startswith("data: "):
-                                    payload_str = decoded[6:].strip()
-                                    if payload_str == "[DONE]" or not payload_str:
-                                        continue
-                                    try:
-                                        payload = json.loads(payload_str)
-                                        if "data" in payload:
-                                            yield f"data: {json.dumps({'type': 'audio_chunk', 'content': payload['data']})}\n\n"
-                                    except Exception as je:
-                                        pass
-                    else:
-                        print(f"Cartesia TTS Error: {response.text}")
-            except Exception as ttse:
-                print(f"TTS Exception Error: {ttse}")
-        
-        yield f"data: {json.dumps({'type': 'done'})}\n\n"
-        
-    except Exception as e:
-        yield f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n"
+                try:
+                    await cartesia_ws.send(json.dumps(req))
+                    await asyncio.wait_for(receiver_task, timeout=5.0)
+                except Exception as ce:
+                     pass
+                finally:
+                    await cartesia_ws.close()
+
+            # Save chat history
+            import re
+            speech_match = re.search(r"<speech>(.*?)</speech>", full_response, re.DOTALL | re.IGNORECASE)
+            final_answer = speech_match.group(1).strip() if speech_match else full_response
+            sessions[session_id] += f"User: {user_query}\nAvatar: {final_answer}\n"
+
+        except Exception as e:
+            await output_queue.put(f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n")
+        finally:
+            await output_queue.put(None) # Sentinel to end generation
+
+    # Start orchestrator logic concurrently using asyncio queue loop
+    orchestrator_task = asyncio.create_task(orchestrate())
+
+    while True:
+        msg = await output_queue.get()
+        if msg is None:
+            break
+        yield msg
+
+    yield f"data: {json.dumps({'type': 'done'})}\n\n"
+
+    # Latency report
+    def ms(start, end):
+        return f"{(end - start) * 1000:.0f}ms" if end is not None else "N/A"
+
+    print("\n" + "─" * 52)
+    print(f"  LATENCY REPORT  │  query: \"{user_query[:40]}\"")
+    print("─" * 52)
+    print(f"  Router          │ {ms(t0, timestamps['t_routed'])}")
+    print(f"  First LLM token │ {ms(t0, timestamps['t_first_token'])}")
+    print(f"  Full LLM done   │ {ms(t0, timestamps['t_llm_done'])}")
+    print(f"  First audio out │ {ms(t0, timestamps['t_first_audio'])}  ◄ end-to-end")
+    print("─" * 52)
+    print(f"  (LLM generation took {ms(timestamps.get('t_routed') or 0, timestamps.get('t_llm_done'))})")
+    if timestamps['t_first_audio']:
+        print(f"  (Cartesia TTS   took {ms(timestamps.get('t_first_token') or 0, timestamps.get('t_first_audio'))})")
+    print("─" * 52 + "\n")
 
 @app.websocket("/api/stt")
 async def stt_websocket(websocket: WebSocket):

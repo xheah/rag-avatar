@@ -1,19 +1,24 @@
 import os
 from dotenv import load_dotenv
 import chromadb
-from google import genai
+import ollama
 from sentence_transformers import SentenceTransformer
 
 # Load environment variables from the .env file
 load_dotenv()
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY is not set in the environment or .env file.")
-
 # Force absolute pathing to avoid relative path confusion
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE_DIR, "avatar_rag_db") # Pointing to the root DB folder
+
+# The local Ollama model to use for all LLM calls.
+OLLAMA_MODEL = "aisingapore/Gemma-SEA-LION-v3-9B-IT:q4_k_m"
+
+# qwen3 outputs tokens to message.thinking (not message.content) when think=True.
+# Passing think=False fixes this. Other models don't support the think param at all,
+# so we only inject it for qwen3 to avoid crashing.
+OLLAMA_THINK_KWARGS: dict = {"think": False} if OLLAMA_MODEL.startswith("qwen3") else {"think": True}
+
 
 # Create global singletons so they only load ONCE
 _DB_CLIENT = None
@@ -27,10 +32,19 @@ def get_db_client():
     return _DB_CLIENT
 
 def get_llm_client():
+    """Returns a singleton Ollama client pointed at the local Ollama server."""
     global _LLM_CLIENT
     if _LLM_CLIENT is None:
-        _LLM_CLIENT = genai.Client(api_key=GEMINI_API_KEY)
+        _LLM_CLIENT = ollama.Client(host="http://localhost:11434")
+        print("LLM CLIENT Loaded Successfully:", _LLM_CLIENT)
     return _LLM_CLIENT
+
+_ASYNC_LLM_CLIENT = None
+def get_async_llm_client():
+    global _ASYNC_LLM_CLIENT
+    if _ASYNC_LLM_CLIENT is None:
+        _ASYNC_LLM_CLIENT = ollama.AsyncClient(host="http://localhost:11434")
+    return _ASYNC_LLM_CLIENT
 
 def get_embedding_model():
     global _EMBEDDING_MODEL
