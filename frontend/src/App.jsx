@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Mic, Trash2, Loader2, BrainCircuit, Upload } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 function App() {
   const [messages, setMessages] = useState([
@@ -442,7 +443,13 @@ function App() {
                         ? 'bg-gradient-to-br from-indigo-500 to-indigo-800 text-white rounded-br-sm' 
                         : 'bg-white/5 border border-white/10 text-slate-200 rounded-bl-sm'}
                   `}>
-                    {msg.content || (msg.role === 'avatar' && orbState !== 'idle' ? <Loader2 className="animate-spin text-indigo-400" size={20} /> : '')}
+                    {msg.content ? (
+                      <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-black/50 prose-pre:border prose-pre:border-white/10">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      msg.role === 'avatar' && orbState !== 'idle' ? <Loader2 className="animate-spin text-indigo-400" size={20} /> : ''
+                    )}
                   </div>
                 )}
               </div>

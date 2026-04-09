@@ -12,7 +12,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE_DIR, "avatar_rag_db") # Pointing to the root DB folder
 
 # The local Ollama model to use for all LLM calls.
-OLLAMA_MODEL = "aisingapore/Gemma-SEA-LION-v3-9B-IT:q4_k_m"
+# OLLAMA_MODEL = "aisingapore/Gemma-SEA-LION-v3-9B-IT:q2_k"
+OLLAMA_MODEL = "llama3.2:3b"
 
 # qwen3 outputs tokens to message.thinking (not message.content) when think=True.
 # Passing think=False fixes this. Other models don't support the think param at all,

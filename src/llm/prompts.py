@@ -185,10 +185,8 @@ async def generate_rag_response_v4_stream(user_query, retrieved_documents, chat_
     2. Keep your response conversational and suitable for text-to-speech audio.
 
     FORMATTING RULES:
-    1. NEVER use Markdown syntax like asterisks (e.g., **word** or *word*) or underscores for emphasis.
-    2. Use ONLY plain text. If you need to emphasize a point, do so through your choice of words or by using capital letters sparingly for acronyms only.
-    3. Do NOT use bullet points or numbered lists; use full, conversational sentences that flow naturally for an audio avatar.
-    4. Ensure there are no special characters or symbols that would look messy on a screen or confuse a text-to-speech engine.
+    1. Do NOT use bullet points or numbered lists; use full, conversational sentences that flow naturally for an audio avatar.
+    2. Ensure there are no special characters or symbols that would look messy on a screen or confuse a text-to-speech engine.
     """
     
     user_prompt = f"""
