@@ -41,6 +41,14 @@ class Offer(BaseModel):
     sdp: str
     type: str
 
+class DualAgentTelemetry(BaseModel):
+    query: str
+    t_llm_1st_ms: float
+    t_llm_done_ms: float
+    t_filler_start_ms: float
+    t_filler_end_ms: float
+    t_audio_start_ms: float
+
 pcs = set()
 
 @app.on_event("startup")
@@ -53,6 +61,30 @@ async def startup_event():
     get_embedding_model() # Trigger the lazy load here
     print("System Ready!")
     print("==================================================\n")
+
+@app.post("/api/telemetry")
+async def receive_telemetry(data: DualAgentTelemetry):
+    """Prints a unified Dual-Agent Latency Report to the terminal."""
+    def fmt(ms_val):
+        return f"{ms_val:.0f}ms"
+
+    print("\n" + "═" * 60)
+    print(f"  DUAL-AGENT LATENCY REPORT  │  query: \"{data.query[:35]}...\"")
+    print("═" * 60)
+    print(f"  1. Filler Start (Agent 1) │ {fmt(data.t_filler_start_ms)}  (Target: 200ms)")
+    print(f"  2. First LLM Token        │ {fmt(data.t_llm_1st_ms)}")
+    print(f"  3. Response Start (Agent 2)│ {fmt(data.t_audio_start_ms)}  (End-to-End)")
+    print("─" * 60)
+    print(f"  4. Full LLM Finished      │ {fmt(data.t_llm_done_ms)}")
+    print("═" * 60)
+    
+    # Calculate Gaps
+    filler_to_response_gap = data.t_audio_start_ms - data.t_filler_end_ms
+    print(f"  GAP: Filler → Response    │ {fmt(filler_to_response_gap)}")
+    if filler_to_response_gap < 0:
+        print(f"  (Note: Real response overlapped filler by {fmt(abs(filler_to_response_gap))})")
+    print("═" * 60 + "\n")
+    return {"status": "ok"}
 
 @app.get("/", response_class=HTMLResponse)
 async def get_index():
@@ -117,18 +149,19 @@ async def chat_stream_generator(user_query: str, session_id: str):
             # Start Cartesia receiver
             receiver_task = asyncio.create_task(cartesia_receiver()) if cartesia_ws else None
 
-            # Stream text from LLM
-            speech_buffer = ""
+            # Tag-aware speech streaming state
+            is_in_speech = False
+            speech_parser_buffer = "" # Accumulates raw chunks to find tags
+            speech_buffer = ""        # Accumulates text for Cartesia synthesis
             
-            # We pick the generator
-
             try:
                 retrieved = get_closest_matches(user_query=user_query, k=5)
             except Exception as re:
                 print(f"Retriever Error: {re}")
                 retrieved = []
+            
             llm_stream = generate_rag_response_v4_stream(user_query=user_query, retrieved_documents=retrieved, chat_history=chat_history)
-            print(llm_stream)
+            
             async for chunk in llm_stream:
                 if timestamps["t_first_token"] is None:
                     timestamps["t_first_token"] = time.perf_counter()
@@ -137,14 +170,40 @@ async def chat_stream_generator(user_query: str, session_id: str):
                 await output_queue.put(f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n")
 
                 if cartesia_ws:
-                    speech_buffer += chunk
+                    # Append new chunk to parser buffer
+                    speech_parser_buffer += chunk
 
-                    # If we have gathered enough context (at least 2 words), flush the previous words to Cartesia
-                    # This gives the TTS engine enough context for natural prosody.
+                    # If we are NOT in a speech block, look for the start tag
+                    if not is_in_speech:
+                        if "<speech>" in speech_parser_buffer:
+                            # Split after the tag to get any text that followed it in the same chunk
+                            parts = speech_parser_buffer.split("<speech>", 1)
+                            is_in_speech = True
+                            # Move the trailing content into the synthesis buffer
+                            speech_buffer += parts[1]
+                            speech_parser_buffer = "" # Clear parser buffer
+                    else:
+                        # We ARE in a speech block. Look for the end tag.
+                        if "</speech>" in speech_parser_buffer:
+                            parts = speech_parser_buffer.split("</speech>", 1)
+                            # Add text leading up to the end tag
+                            speech_buffer += parts[0]
+                            is_in_speech = False
+                            speech_parser_buffer = "" # Stop speech synthesis for this turn
+                        else:
+                            # Still in speech. Safely move new content to speech_buffer as soon as it's safe 
+                            # (avoiding cutting off part of a potential </speech> tag)
+                            if len(speech_parser_buffer) > 10:
+                                # Keep the very end in case it's part of a tag
+                                to_process = speech_parser_buffer[:-10]
+                                speech_buffer += to_process
+                                speech_parser_buffer = speech_parser_buffer[-10:]
+
+                    # TTS Buffering & Synthesis (only if we have content in speech_buffer)
                     if len(speech_buffer.split(" ")) >= 2:
                         words = speech_buffer.split(" ")
                         to_send = " ".join(words[:-1]) + " "
-                        speech_buffer = words[-1] # Carry over the latest (possibly partial) word
+                        speech_buffer = words[-1] 
                         
                         req = {
                             "context_id": context_id,
@@ -170,10 +229,15 @@ async def chat_stream_generator(user_query: str, session_id: str):
 
             # Flush the rest of the buffer and close stream
             if cartesia_ws:
+                # If we are STILL in a speech block (didn't see </speech>), flush the remaining parser buffer
+                final_text = speech_buffer
+                if is_in_speech:
+                    final_text += speech_parser_buffer
+                
                 req = {
                     "context_id": context_id,
                     "model_id": "sonic-turbo",
-                    "transcript": speech_buffer,
+                    "transcript": final_text,
                     "voice": {
                         "mode": "id",
                         "id": "5ee9feff-1265-424a-9d7f-8e4d431a12c7"
@@ -194,16 +258,20 @@ async def chat_stream_generator(user_query: str, session_id: str):
                     await cartesia_ws.close()
 
             # Save chat history
-            import re
-            final_answer = full_response
-            sessions[session_id] += f"User: {user_query}\nAvatar: {final_answer}\n"
+            sessions[session_id] += f"User: {user_query}\nAvatar: {full_response}\n"
 
         except Exception as e:
             await output_queue.put(f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n")
         finally:
-            await output_queue.put(None) # Sentinel to end generation
+            # We send the server-measured timestamps in the final done event so the client can use them for the combined report
+            server_metrics = {
+                "t_first_token": timestamps["t_first_token"] - t0 if timestamps["t_first_token"] else 0,
+                "t_llm_done": timestamps["t_llm_done"] - t0 if timestamps["t_llm_done"] else 0
+            }
+            await output_queue.put(f"data: {json.dumps({'type': 'done', 'server_metrics': server_metrics})}\n\n")
+            await output_queue.put(None) 
 
-    # Start orchestrator logic concurrently using asyncio queue loop
+    # Start orchestrator logic
     orchestrator_task = asyncio.create_task(orchestrate())
 
     while True:
@@ -212,22 +280,6 @@ async def chat_stream_generator(user_query: str, session_id: str):
             break
         yield msg
 
-    yield f"data: {json.dumps({'type': 'done'})}\n\n"
-
-    # Latency report
-    def ms(start, end):
-        return f"{(end - start) * 1000:.0f}ms" if end is not None else "N/A"
-
-    print("\n" + "─" * 52)
-    print(f"  LATENCY REPORT  │  query: \"{user_query[:40]}\"")
-    print("─" * 52)
-    print(f"  First LLM token │ {ms(t0, timestamps['t_first_token'])}")
-    print(f"  Full LLM done   │ {ms(t0, timestamps['t_llm_done'])}")
-    print(f"  First audio out │ {ms(t0, timestamps['t_first_audio'])}  ◄ end-to-end")
-    print("─" * 52)
-    if timestamps['t_first_audio']:
-        print(f"  (Cartesia TTS   took {ms(timestamps.get('t_first_token') or 0, timestamps.get('t_first_audio'))})")
-    print("─" * 52 + "\n")
 
 async def process_audio_track(track, channel):
     """

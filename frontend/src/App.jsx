@@ -181,16 +181,68 @@ function App() {
       else startListening();
   };
 
+  const playLocalFiller = async (url, tSend) => {
+    try {
+        let audioCtx = audioContextRef.current;
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 44100 });
+            audioContextRef.current = audioCtx;
+        }
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+        const source = audioCtx.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioCtx.destination);
+        
+        const tFillerStart = performance.now();
+        const startTime = Math.max(nextStartTimeRef.current, audioCtx.currentTime);
+        source.start(startTime);
+        nextStartTimeRef.current = startTime + audioBuffer.duration;
+        setOrbState('speaking');
+
+        return {
+            start: tFillerStart - tSend,
+            end: (tFillerStart - tSend) + (audioBuffer.duration * 1000)
+        };
+    } catch (e) {
+        console.error("Filler playback error", e);
+        return null;
+    }
+  };
+
   const handleSend = async (autoMessage = null) => {
     const textToSend = typeof autoMessage === 'string' ? autoMessage : inputValue.trim();
     if (!textToSend || orbState !== 'idle') return;
 
     if (isListening) stopListening();
 
+    const tSend = performance.now();
     setMessages(prev => [...prev, { role: 'user', content: textToSend, thoughts: null }]);
     setInputValue('');
     transcriptRef.current = '';
     setOrbState('thinking');
+
+    // Telemetry storage
+    let telemetry = {
+        query: textToSend,
+        t_filler_start_ms: 0,
+        t_filler_end_ms: 0,
+        t_audio_start_ms: 0,
+        t_llm_1st_ms: 0,
+        t_llm_done_ms: 0
+    };
+
+    const fillerTimer = setTimeout(async () => {
+        const result = await playLocalFiller('/hmm-letsseee.wav', tSend);
+        if (result) {
+            telemetry.t_filler_start_ms = result.start;
+            telemetry.t_filler_end_ms = result.end;
+        }
+    }, 200);
 
     try {
       const response = await fetch('/api/chat_stream', {
@@ -223,7 +275,7 @@ function App() {
       if (audioCtx.state === 'suspended') {
           audioCtx.resume();
       }
-      nextStartTimeRef.current = audioCtx.currentTime;
+      nextStartTimeRef.current = Math.max(nextStartTimeRef.current, audioCtx.currentTime);
 
       while (!isDone) {
         const { value, done } = await reader.read();
@@ -231,7 +283,6 @@ function App() {
         
         eventBuffer += decoder.decode(value, { stream: true });
         const events = eventBuffer.split('\n\n');
-        // Pop the last element off to keep it in the buffer (it's either empty or a partial event)
         eventBuffer = events.pop();
         
         for (const event of events) {
@@ -266,8 +317,6 @@ function App() {
                 } else if (!currentRaw.includes('<speech>') && !currentRaw.includes('<thought>') && currentRaw.length > 20) {
                   setOrbState('speaking');
                   parsedContent = currentRaw;
-                } else {
-                  setOrbState('thinking');
                 }
               } else {
                 setOrbState('speaking');
@@ -281,6 +330,11 @@ function App() {
               });
 
             } else if (payload.type === 'audio_chunk') {
+                clearTimeout(fillerTimer);
+                if (telemetry.t_audio_start_ms === 0) {
+                    telemetry.t_audio_start_ms = performance.now() - tSend;
+                }
+
                 try {
                     const b64Data = payload.content;
                     const binaryStr = atob(b64Data);
@@ -307,6 +361,15 @@ function App() {
               throw new Error(payload.content);
             } else if (payload.type === 'done') {
               isDone = true;
+              if (payload.server_metrics) {
+                  telemetry.t_llm_1st_ms = payload.server_metrics.t_first_token * 1000;
+                  telemetry.t_llm_done_ms = payload.server_metrics.t_llm_done * 1000;
+              }
+              fetch('/api/telemetry', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(telemetry)
+              }).catch(e => console.error("Telemetry failed", e));
             }
           } catch (e) {
             // Unparseable or incomplete JSON is ignored

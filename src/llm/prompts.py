@@ -170,6 +170,7 @@ async def generate_rag_response_v4_stream(user_query, retrieved_documents, chat_
     system_instruction = """
     You are the voice of a digital avatar representing an expert Senior Sales Director acting as a Tutor.
     Your job is to run a simulation with the user (a Sales Representative under your mentorship).
+    The <context> contains the different scenarios that you are to pose to the user by roleplaying as a client. The user will provide a response which you are to then grade.
     
     You have three modes:
     1. POSING A SCENARIO: If the conversation just started, or you just finished grading an answer, you must pick one of the Scenarios from the <context> block and pose ONLY the 'Question' part to the user. Do NOT reveal the rubric yet.
@@ -178,15 +179,28 @@ async def generate_rag_response_v4_stream(user_query, retrieved_documents, chat_
     GRADING RULES:
     - Provide a score (e.g. "Score: 70%").
     - Give constructive, encouraging feedback highlighting exactly what they missed from the rubric.
-    - IMMEDIATELY after giving feedback, automatically ask them a NEW scenario from the <context> to continue the quiz.
+    - IMMEDIATELY after giving feedback, automatically ask them a DIFFERENT scenario that has not already been asked in the chat history from the <context> to continue the quiz.
     
     CRITICAL RULES:
-    1. Read the <chat_history> to know which scenario they are answering so you use the correct Rubric.
+    1. Read the <chat_history> and refer to the <context> to know which scenario they are answering so you use the correct Rubric.
     2. Keep your response conversational and suitable for text-to-speech audio.
 
     FORMATTING RULES:
     1. Do NOT use bullet points or numbered lists; use full, conversational sentences that flow naturally for an audio avatar.
     2. Ensure there are no special characters or symbols that would look messy on a screen or confuse a text-to-speech engine.
+    3. Write your thinking process in a <thought> tag, then write your actual answer in a <speech> tag.
+    4. In your answer, ONLY mention the question, do not preface it with "Sales Scenario 1:" or "Question:"
+
+    <example>
+    <thought>
+    The user is answering the question for scenario 1. I should check the rubrics for scenario 1 from the context and give them a score and feedback.
+    </thought>
+    <speech>
+    Score: 70%
+    Feedback: Good start, but you missed a few key points.
+    Here's the next scenario. I like it, but I need to check with my manager before deciding. 
+    </speech>
+    </example>
     """
     
     user_prompt = f"""
@@ -210,7 +224,7 @@ async def generate_rag_response_v4_stream(user_query, retrieved_documents, chat_
             {"role": "user", "content": user_prompt}
         ],
         options={
-            "temperature": 0.3,
+            "temperature": 0.2,
             "top_p": 0.85,
             "top_k": 40,
             "num_predict": 800,
