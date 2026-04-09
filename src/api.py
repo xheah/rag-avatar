@@ -139,11 +139,12 @@ async def chat_stream_generator(user_query: str, session_id: str):
                 if cartesia_ws:
                     speech_buffer += chunk
 
-                    # If we have gathered enough words, flush to Cartesia
-                    if len(speech_buffer.split(" ")) >= 1:
+                    # If we have gathered enough context (at least 2 words), flush the previous words to Cartesia
+                    # This gives the TTS engine enough context for natural prosody.
+                    if len(speech_buffer.split(" ")) >= 2:
                         words = speech_buffer.split(" ")
                         to_send = " ".join(words[:-1]) + " "
-                        speech_buffer = words[-1] # Carry over the latest word
+                        speech_buffer = words[-1] # Carry over the latest (possibly partial) word
                         
                         req = {
                             "context_id": context_id,
@@ -162,8 +163,8 @@ async def chat_stream_generator(user_query: str, session_id: str):
                         }
                         try:
                             await cartesia_ws.send(json.dumps(req))
-                        except Exception as ce:
-                            print(f"Cartesia send error: {ce}")
+                        except Exception as e:
+                            print(f"Cartesia send error: {e}")
 
             timestamps["t_llm_done"] = time.perf_counter()
 
@@ -171,11 +172,11 @@ async def chat_stream_generator(user_query: str, session_id: str):
             if cartesia_ws:
                 req = {
                     "context_id": context_id,
-                    "model_id": "sonic-english",
+                    "model_id": "sonic-turbo",
                     "transcript": speech_buffer,
                     "voice": {
                         "mode": "id",
-                        "id": "9626c31c-bec5-4cca-baa8-f8ba9e84c8bc"
+                        "id": "5ee9feff-1265-424a-9d7f-8e4d431a12c7"
                     },
                     "output_format": {
                         "container": "raw",
