@@ -7,9 +7,10 @@ from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, StreamingResponse
 from pydantic import BaseModel
-from typing import Dict
-
-# Ensure src is importable
+from typing import Dict, Optional
+import aiortc
+from aiortc import RTCPeerConnection, RTCSessionDescription, MediaStreamTrack, RTCIceServer, RTCConfiguration
+from aiortc.contrib.media import MediaRelay
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.config import get_embedding_model
@@ -35,6 +36,12 @@ sessions: Dict[str, str] = {}
 class ChatRequest(BaseModel):
     message: str
     session_id: str = "default_session"
+
+class Offer(BaseModel):
+    sdp: str
+    type: str
+
+pcs = set()
 
 @app.on_event("startup")
 async def startup_event():
@@ -221,18 +228,26 @@ async def chat_stream_generator(user_query: str, session_id: str):
         print(f"  (Cartesia TTS   took {ms(timestamps.get('t_first_token') or 0, timestamps.get('t_first_audio'))})")
     print("─" * 52 + "\n")
 
-@app.websocket("/api/stt")
-async def stt_websocket(websocket: WebSocket):
-    await websocket.accept()
-    # endpointing=500 means if the user pauses for 500ms, Deepgram sends a "speech_final" event!
-    # smart_format applies punctuation and capitalization automatically
-    DEEPGRAM_URL = 'wss://api.deepgram.com/v1/listen?smart_format=true&interim_results=true&endpointing=500'
+async def process_audio_track(track, channel):
+    """
+    Receives audio frames from the WebRTC track, resamples them to 16kHz 16-bit PCM,
+    and sends them to Deepgram. Forwards Deepgram responses back through the data channel.
+    """
+    import av
+    import time
     api_key = os.getenv("DEEPGRAM_API_KEY")
-    
     if not api_key:
         print("Missing DEEPGRAM_API_KEY")
-        await websocket.close(code=1011)
         return
+
+    # Deepgram URL for streaming
+    DEEPGRAM_URL = 'wss://api.deepgram.com/v1/listen?encoding=linear16&sample_rate=16000&channels=1&smart_format=true&interim_results=true&endpointing=500'
+    
+    resampler = av.AudioResampler(
+        format='s16',
+        layout='mono',
+        rate=16000,
+    )
 
     try:
         async with websockets.connect(
@@ -240,43 +255,71 @@ async def stt_websocket(websocket: WebSocket):
             additional_headers={"Authorization": f"Token {api_key}"}
         ) as dg_socket:
             
-            async def receiver():
-                """Receives transcripts from Deepgram and forwards to React frontend"""
+            async def dg_receiver():
                 try:
                     while True:
                         result = await dg_socket.recv()
-                        await websocket.send_text(result)
-                except websockets.exceptions.ConnectionClosed:
-                    pass
+                        if channel and channel.readyState == "open":
+                            channel.send(result)
                 except Exception as e:
-                    print(f"Deepgram STT Receive Error: {e}")
+                    print(f"Deepgram WebRTC Receiver Error: {e}")
 
-            async def sender():
-                """Receives raw WebM audio chunks from React and pipes to Deepgram"""
-                try:
-                    while True:
-                        data = await websocket.receive_bytes()
-                        await dg_socket.send(data)
-                except WebSocketDisconnect:
-                    pass
-                except Exception as e:
-                    print(f"Deepgram STT Send Error: {e}")
+            receiver_task = asyncio.create_task(dg_receiver())
 
-            # Run both concurrently
-            done, pending = await asyncio.wait(
-                [asyncio.create_task(receiver()), asyncio.create_task(sender())],
-                return_when=asyncio.FIRST_COMPLETED
-            )
-            # Cancel the remaining task when one finishes
-            for task in pending:
-                task.cancel()
+            try:
+                while True:
+                    frame = await track.recv()
+                    # Resample to 16k mono
+                    resampled_frames = resampler.resample(frame)
+                    for f in resampled_frames:
+                        await dg_socket.send(f.to_ndarray().tobytes())
+            except Exception as e:
+                print(f"Audio track processing ended: {e}")
+            finally:
+                receiver_task.cancel()
     except Exception as e:
-        print(f"Deepgram WebSocket Error: {e}")
-    finally:
-        try:
-            await websocket.close()
-        except:
-            pass
+        print(f"Deepgram WebRTC Connection Error: {e}")
+
+@app.post("/api/offer")
+async def offer(params: Offer):
+    offer = RTCSessionDescription(sdp=params.sdp, type=params.type)
+    pc = RTCPeerConnection()
+    pcs.add(pc)
+
+    data_channel = None
+
+    @pc.on("datachannel")
+    def on_datachannel(channel):
+        nonlocal data_channel
+        data_channel = channel
+        print(f"Data channel established: {channel.label}")
+
+    @pc.on("track")
+    def on_track(track):
+        if track.kind == "audio":
+            print("Audio track received via WebRTC")
+            # We wait a tiny bit to ensure data_channel is ready if it was created by client
+            async def start_processing():
+                await asyncio.sleep(1) # Simple buffer for channel setup
+                await process_audio_track(track, data_channel)
+            
+            asyncio.create_task(start_processing())
+
+    @pc.on("iceconnectionstatechange")
+    async def on_iceconnectionstatechange():
+        if pc.iceConnectionState == "failed" or pc.iceConnectionState == "closed":
+            await pc.close()
+            pcs.discard(pc)
+
+    await pc.setRemoteDescription(offer)
+    answer = await pc.createAnswer()
+    await pc.setLocalDescription(answer)
+
+    return {
+        "sdp": pc.localDescription.sdp,
+        "type": pc.localDescription.type
+    }
+
 
 @app.post("/api/chat_stream")
 async def chat_endpoint_stream(req: ChatRequest):

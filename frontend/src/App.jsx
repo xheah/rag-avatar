@@ -9,10 +9,10 @@ function App() {
   const [inputValue, setInputValue] = useState('');
   const [orbState, setOrbState] = useState('idle'); // idle, thinking, speaking
   
-  // Voice State
+  // WebRTC State
   const [isListening, setIsListening] = useState(false);
-  const mediaRecorderRef = useRef(null);
-  const sttSocketRef = useRef(null);
+  const pcRef = useRef(null);
+  const dcRef = useRef(null);
   const transcriptRef = useRef('');
   const fileInputRef = useRef(null);
   const audioContextRef = useRef(null);
@@ -41,43 +41,28 @@ function App() {
 
   const stopListening = () => {
     setIsListening(false);
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());
+    if (pcRef.current) {
+        pcRef.current.close();
+        pcRef.current = null;
     }
-    if (sttSocketRef.current && sttSocketRef.current.readyState === WebSocket.OPEN) {
-      sttSocketRef.current.close();
-    }
+    dcRef.current = null;
   };
 
   const startListening = async () => {
     try {
       transcriptRef.current = '';
       setInputValue('');
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-      mediaRecorderRef.current = mediaRecorder;
+      
+      const pc = new RTCPeerConnection();
+      pcRef.current = pc;
 
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${wsProtocol}//${window.location.host}/api/stt`;
-      const socket = new WebSocket(wsUrl);
-      sttSocketRef.current = socket;
+      const dc = pc.createDataChannel("chat");
+      dcRef.current = dc;
 
-      socket.onopen = () => {
-        setIsListening(true);
-        mediaRecorder.addEventListener('dataavailable', event => {
-          if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) {
-            socket.send(event.data);
-          }
-        });
-        mediaRecorder.start(250); // Send raw WebM chunks to Deepgram every 250ms
-      };
-
-      socket.onmessage = (event) => {
+      dc.onmessage = (event) => {
         const received = JSON.parse(event.data);
         if (received.type === 'Results' && received.channel?.alternatives?.[0]) {
             const transcript = received.channel.alternatives[0].transcript;
-            
             if (transcript) {
                 if (received.is_final) {
                     transcriptRef.current += (transcriptRef.current ? ' ' : '') + transcript;
@@ -86,7 +71,6 @@ function App() {
                     setInputValue(transcriptRef.current + (transcriptRef.current ? ' ' : '') + transcript);
                 }
             }
-
             if (received.speech_final) {
                 const finalStr = transcriptRef.current.trim();
                 if (finalStr.length > 0) {
@@ -97,14 +81,24 @@ function App() {
         }
       };
 
-      socket.onerror = (e) => {
-          console.error("STT WebSocket Error:", e);
-          stopListening();
-      };
-      
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+
+      const response = await fetch('/api/offer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sdp: pc.localDescription.sdp, type: pc.localDescription.type })
+      });
+      const answer = await response.json();
+      await pc.setRemoteDescription(new RTCSessionDescription(answer));
+
+      setIsListening(true);
     } catch (err) {
-      console.error("Error accessing microphone", err);
-      alert("Microphone access denied or unavailable.");
+      console.error("Error with WebRTC listening", err);
+      alert("Microphone access denied or WebRTC failure.");
       stopListening();
     }
   };
@@ -116,49 +110,23 @@ function App() {
     try {
       transcriptRef.current = '';
       setInputValue('');
-      setIsListening(true);
       
       const audioUrl = URL.createObjectURL(file);
       const audioEl = new Audio(audioUrl);
-      audioEl.muted = true; // Play silently
+      audioEl.muted = true;
       await audioEl.play();
 
-      // Capture stream from playing audio
       const stream = audioEl.captureStream ? audioEl.captureStream() : audioEl.mozCaptureStream();
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-      mediaRecorderRef.current = mediaRecorder;
+      
+      const pc = new RTCPeerConnection();
+      pcRef.current = pc;
+      const dc = pc.createDataChannel("chat");
+      dcRef.current = dc;
 
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${wsProtocol}//${window.location.host}/api/stt`;
-      const socket = new WebSocket(wsUrl);
-      sttSocketRef.current = socket;
-
-      socket.onopen = () => {
-        mediaRecorder.addEventListener('dataavailable', e => {
-          if (e.data.size > 0 && socket.readyState === WebSocket.OPEN) {
-            socket.send(e.data);
-          }
-        });
-        mediaRecorder.start(250); 
-      };
-
-      audioEl.onended = () => {
-         // File playback finished. Give Deepgram 500ms to return final words, 
-         // then force a send because the stream won't have trailing silence to trigger speech_final naturally.
-         setTimeout(() => {
-             const finalStr = transcriptRef.current.trim();
-             stopListening();
-             if (finalStr.length > 0) {
-                 handleSend(finalStr);
-             }
-         }, 500);
-      };
-
-      socket.onmessage = (event) => {
+      dc.onmessage = (event) => {
         const received = JSON.parse(event.data);
         if (received.type === 'Results' && received.channel?.alternatives?.[0]) {
             const transcript = received.channel.alternatives[0].transcript;
-            
             if (transcript) {
                 if (received.is_final) {
                     transcriptRef.current += (transcriptRef.current ? ' ' : '') + transcript;
@@ -167,28 +135,39 @@ function App() {
                     setInputValue(transcriptRef.current + (transcriptRef.current ? ' ' : '') + transcript);
                 }
             }
-
-            if (received.speech_final) {
-                const finalStr = transcriptRef.current.trim();
-                if (finalStr.length > 0) {
-                    stopListening();
-                    handleSend(finalStr);
-                }
-            }
         }
       };
 
-      socket.onerror = (e) => {
-          console.error("STT WebSocket Error:", e);
-          stopListening();
+      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+
+      const response = await fetch('/api/offer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sdp: pc.localDescription.sdp, type: pc.localDescription.type })
+      });
+      const answer = await response.json();
+      await pc.setRemoteDescription(new RTCSessionDescription(answer));
+
+      setIsListening(true);
+
+      audioEl.onended = () => {
+         setTimeout(() => {
+             const finalStr = transcriptRef.current.trim();
+             stopListening();
+             if (finalStr.length > 0) {
+                 handleSend(finalStr);
+             }
+         }, 1000);
       };
-      
+
     } catch (err) {
-      console.error("Error with file test:", err);
+      console.error("Error with WebRTC file upload:", err);
       alert("Failed to inject audio file.");
       stopListening();
     }
-    // clear input
     event.target.value = null;
   };
 
