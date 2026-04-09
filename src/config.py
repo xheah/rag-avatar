@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 import chromadb
-import ollama
+from groq import Groq, AsyncGroq
 from sentence_transformers import SentenceTransformer
 
 # Load environment variables from the .env file
@@ -11,15 +11,8 @@ load_dotenv()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE_DIR, "avatar_rag_db") # Pointing to the root DB folder
 
-# The local Ollama model to use for all LLM calls.
-# OLLAMA_MODEL = "aisingapore/Gemma-SEA-LION-v3-9B-IT:q2_k"
-OLLAMA_MODEL = "llama3.2:3b"
-
-# qwen3 outputs tokens to message.thinking (not message.content) when think=True.
-# Passing think=False fixes this. Other models don't support the think param at all,
-# so we only inject it for qwen3 to avoid crashing.
-OLLAMA_THINK_KWARGS: dict = {"think": False} if OLLAMA_MODEL.startswith("qwen3") else {}
-
+# The Groq model to use for all LLM calls.
+GROQ_MODEL = "llama-3.3-70b-versatile"
 
 # Create global singletons so they only load ONCE
 _DB_CLIENT = None
@@ -33,18 +26,25 @@ def get_db_client():
     return _DB_CLIENT
 
 def get_llm_client():
-    """Returns a singleton Ollama client pointed at the local Ollama server."""
+    """Returns a singleton Groq client."""
     global _LLM_CLIENT
     if _LLM_CLIENT is None:
-        _LLM_CLIENT = ollama.Client(host="http://localhost:11434")
-        print("LLM CLIENT Loaded Successfully:", _LLM_CLIENT)
+        apiKey = os.getenv("GROQ_API_KEY")
+        if not apiKey:
+            raise ValueError("GROQ_API_KEY not found in environment variables")
+        _LLM_CLIENT = Groq(api_key=apiKey)
+        print("GROQ LLM CLIENT Loaded Successfully")
     return _LLM_CLIENT
 
 _ASYNC_LLM_CLIENT = None
 def get_async_llm_client():
+    """Returns a singleton AsyncGroq client."""
     global _ASYNC_LLM_CLIENT
     if _ASYNC_LLM_CLIENT is None:
-        _ASYNC_LLM_CLIENT = ollama.AsyncClient(host="http://localhost:11434")
+        apiKey = os.getenv("GROQ_API_KEY")
+        if not apiKey:
+            raise ValueError("GROQ_API_KEY not found in environment variables")
+        _ASYNC_LLM_CLIENT = AsyncGroq(api_key=apiKey)
     return _ASYNC_LLM_CLIENT
 
 def get_embedding_model():

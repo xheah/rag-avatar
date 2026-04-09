@@ -1,4 +1,4 @@
-from src.config import get_llm_client, get_async_llm_client, OLLAMA_MODEL, OLLAMA_THINK_KWARGS
+from src.config import get_llm_client, get_async_llm_client, GROQ_MODEL
 
 SYSTEM_PROMPT = """
 You are the voice of a digital avatar representing an AI integration agency. 
@@ -35,20 +35,18 @@ def adaptive_router(chat_history, latest_user_query):
     Output nothing else. Only RAG or CHAT.
     """
     
-    llm_client = get_llm_client()
-    response = llm_client.chat(
-        model=OLLAMA_MODEL,
+    client = get_llm_client()
+    response = client.chat.completions.create(
+        model=GROQ_MODEL,
         messages=[
             {"role": "system", "content": system_instruction},
             {"role": "user", "content": f"Chat history:\n{chat_history}\n\nLatest query: {latest_user_query}"}
         ],
-        options={"temperature": 0.0},
-        **OLLAMA_THINK_KWARGS
+        temperature=0.0
     )
     
-    route = response.message.content.strip().upper()
-    return route if route in ["RAG", "CHAT"] else "RAG" # Default to RAG if it glitches
-
+    route = response.choices[0].message.content.strip().upper()
+    return route if route in ["RAG", "CHAT"] else "RAG"
 
 def generate_chat_response(user_query, chat_history):
     system_instruction = """
@@ -57,27 +55,25 @@ def generate_chat_response(user_query, chat_history):
     Respond warmly, professionally, and tell them to say 'Start Quiz' whenever they are ready.
     """
     
-    llm_client = get_llm_client()
-    response = llm_client.chat(
-        model=OLLAMA_MODEL,
+    client = get_llm_client()
+    response = client.chat.completions.create(
+        model=GROQ_MODEL,
         messages=[
             {"role": "system", "content": system_instruction},
             {"role": "user", "content": f"<chat_history>{chat_history}</chat_history>\n\n<question>{user_query}</question>"}
         ],
-        options={"temperature": 0.5, "num_predict": 100},
-        **OLLAMA_THINK_KWARGS
+        temperature=0.5,
+        max_tokens=150
     )
     
-    return response.message.content.strip()
+    return response.choices[0].message.content.strip()
 
 def generate_rag_response_v4(user_query, retrieved_documents, chat_history=""):
-    # 1. Format the context
     context_str = "\n\n".join([
         f"[Sales Scenario {i+1}]:\n{doc['document']}" 
         for i, doc in enumerate(retrieved_documents)
     ])
     
-    # 2. Build the engineered prompt
     system_instruction = """
     You are the voice of a digital avatar representing an expert Senior Sales Director acting as a Tutor.
     Your job is to run a simulation with the user (a Sales Representative under your mentorship).
@@ -110,32 +106,26 @@ def generate_rag_response_v4(user_query, retrieved_documents, chat_history=""):
     </student_input>
     """
     
-    llm_client = get_llm_client()
-    
-    response = llm_client.chat(
-        model=OLLAMA_MODEL,
+    client = get_llm_client()
+    response = client.chat.completions.create(
+        model=GROQ_MODEL,
         messages=[
             {"role": "system", "content": system_instruction},
             {"role": "user", "content": user_prompt}
         ],
-        options={
-            "temperature": 0.3,
-            "top_p": 0.85,
-            "top_k": 40,
-            "num_predict": 800,
-            "stop": ["User:", "Client:"]
-        },
-        **OLLAMA_THINK_KWARGS
+        temperature=0.3,
+        max_tokens=800,
+        stop=["User:", "Client:"]
     )
     
-    raw_text = response.message.content
+    raw_text = response.choices[0].message.content
     
     import re
     speech_match = re.search(r"<speech>(.*?)</speech>", raw_text, re.DOTALL | re.IGNORECASE)
     thought_match = re.search(r"<thought>(.*?)</thought>", raw_text, re.DOTALL | re.IGNORECASE)
     
     final_spoken_answer = speech_match.group(1).strip() if speech_match else raw_text
-    thought = thought_match.group(1).strip() if thought_match else "Invalid thoughts"
+    thought = thought_match.group(1).strip() if thought_match else "No thoughts provided"
         
     return final_spoken_answer, thought
 
@@ -145,19 +135,19 @@ async def generate_chat_response_stream(user_query, chat_history):
     The user is making casual conversation (e.g., greetings, thanks, farewells).
     Respond warmly, professionally, and tell them to say 'Start Quiz' whenever they are ready.
     """
-    llm_client = get_async_llm_client()
-    stream = await llm_client.chat(
-        model=OLLAMA_MODEL,
+    client = get_async_llm_client()
+    stream = await client.chat.completions.create(
+        model=GROQ_MODEL,
         messages=[
             {"role": "system", "content": system_instruction},
             {"role": "user", "content": f"<chat_history>{chat_history}</chat_history>\n\n<question>{user_query}</question>"}
         ],
-        options={"temperature": 0.5, "num_predict": 100},
-        stream=True,
-        **OLLAMA_THINK_KWARGS
+        temperature=0.5,
+        max_tokens=150,
+        stream=True
     )
     async for chunk in stream:
-        token = chunk.message.content
+        token = chunk.choices[0].delta.content
         if token:
             yield token
 
@@ -197,7 +187,7 @@ async def generate_rag_response_v4_stream(user_query, retrieved_documents, chat_
     </thought>
     <speech>
     Score: 70%
-    Feedback: Good start, but you missed a few key points.
+    Good start, but you missed a few key points.
     Here's the next scenario. I like it, but I need to check with my manager before deciding. 
     </speech>
     </example>
@@ -216,30 +206,25 @@ async def generate_rag_response_v4_stream(user_query, retrieved_documents, chat_
     {user_query}
     </student_input>
     """
-    llm_client = get_async_llm_client()
-    stream = await llm_client.chat(
-        model=OLLAMA_MODEL,
+    client = get_async_llm_client()
+    stream = await client.chat.completions.create(
+        model=GROQ_MODEL,
         messages=[
             {"role": "system", "content": system_instruction},
             {"role": "user", "content": user_prompt}
         ],
-        options={
-            "temperature": 0.2,
-            "top_p": 0.85,
-            "top_k": 40,
-            "num_predict": 800,
-            "stop": ["User:", "Client:"]
-        },
-        stream=True,
-        **OLLAMA_THINK_KWARGS
+        temperature=0.2,
+        top_p=0.85,
+        max_tokens=800,
+        stop=["User:", "Client:"],
+        stream=True
     )
     async for chunk in stream:
-        token = chunk.message.content
+        token = chunk.choices[0].delta.content
         if token:
             yield token
 
 def rewrite_query(chat_history, latest_user_query):
-    # should be super fast to save latency, so no complex prompting
     system_instruction = """
     You are a query rewriter. Look at the chat history and the latest user query.
     If the user's query contains pronouns (it, that, they, etc.) or relies on previous context, rewrite it into a single standalone sentence.
@@ -247,24 +232,14 @@ def rewrite_query(chat_history, latest_user_query):
     DO NOT answer the question. ONLY output the rewritten query.
     """
 
-    user_prompt = f"""
-    Chat History:
-    {chat_history}
-
-    Latest Query: {latest_user_query}
-
-    Rewritten Query:
-    """
-
-    llm_client = get_llm_client()
-    response = llm_client.chat(
-        model=OLLAMA_MODEL,
+    client = get_llm_client()
+    response = client.chat.completions.create(
+        model=GROQ_MODEL,
         messages=[
             {"role": "system", "content": system_instruction},
-            {"role": "user", "content": user_prompt}
+            {"role": "user", "content": f"Chat History:\n{chat_history}\n\nLatest Query: {latest_user_query}"}
         ],
-        options={"temperature": 0.0},
-        **OLLAMA_THINK_KWARGS
+        temperature=0.0
     )
 
-    return response.message.content.strip()
+    return response.choices[0].message.content.strip()

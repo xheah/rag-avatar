@@ -301,24 +301,28 @@ function App() {
               let parsedContent = "";
               let parsedThoughts = null;
 
-              if (route === 'RAG') {
-                const thoughtMatch = currentRaw.match(/<thought>([\s\S]*?)(?:<\/thought>|<speech>|$)/i);
-                const speechMatch = currentRaw.match(/<speech>([\s\S]*?)(?:<\/speech>|$)/i);
-                
-                if (thoughtMatch && thoughtMatch[1].trim().length > 0) {
-                    parsedThoughts = thoughtMatch[1].trim();
-                } else if (currentRaw.includes('<thought>') && !currentRaw.includes('<speech>')) {
-                    parsedThoughts = "";
-                }
+              // Always attempt to parse tags regardless of the route (in case the model is "talkative")
+              const thoughtMatch = currentRaw.match(/<thought>([\s\S]*?)(?:<\/thought>|(?=<speech>)|$)/i);
+              const speechMatch = currentRaw.match(/<speech>([\s\S]*?)(?:<\/speech>|$)/i);
+              
+              if (thoughtMatch) {
+                  parsedThoughts = thoughtMatch[1].replace(/<thought>|<\/thought>/gi, '').trim();
+              }
 
-                if (speechMatch) {
-                  setOrbState('speaking');
-                  parsedContent = speechMatch[1].trim();
-                } else if (!currentRaw.includes('<speech>') && !currentRaw.includes('<thought>') && currentRaw.length > 20) {
-                  setOrbState('speaking');
-                  parsedContent = currentRaw;
-                }
+              if (speechMatch) {
+                setOrbState('speaking');
+                parsedContent = speechMatch[1].replace(/<speech>|<\/speech>/gi, '').trim();
+              } else if (currentRaw.includes('<speech>')) {
+                // Partial speech stream
+                setOrbState('speaking');
+                const parts = currentRaw.split(/<speech>/i);
+                parsedContent = parts[parts.length - 1].replace(/<\/speech>/gi, '').trim();
+              } else if (currentRaw.includes('<thought>')) {
+                // We have a thought block but NO speech block yet
+                // Keep content empty so the speech bubble doesn't show garbage with tags
+                parsedContent = "";
               } else {
+                // Standard case: no tags at all or model forgot tags
                 setOrbState('speaking');
                 parsedContent = currentRaw;
               }
@@ -464,33 +468,40 @@ function App() {
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex max-w-[85%] flex-col gap-2 ${msg.role === 'user' ? 'self-end' : 'self-start'}`}>
                 
-                {/* Thinking UI */}
-                {msg.thoughts !== null && (
-                  <div className="text-sm font-mono bg-black/40 border border-white/5 p-4 rounded-2xl text-slate-300 w-full shadow-inner flex flex-col gap-3">
-                    <div className="flex items-center gap-2 text-indigo-400 font-bold uppercase tracking-wider text-xs">
-                      {(!msg.content && orbState === 'thinking') ? <Loader2 className="animate-spin" size={14} /> : <BrainCircuit size={14} />}
-                      Reasoning Process
-                    </div>
-                    <div className="whitespace-pre-wrap leading-relaxed opacity-90 text-[13px] overflow-hidden">
-                      {msg.thoughts || 'Processing context...'}
+                {/* Reasoning Process (Blackbox) */}
+                {msg.role === 'avatar' && msg.thoughts !== null && (
+                  <div className="w-full mb-1">
+                    <div className="text-xs font-mono bg-black/60 border border-white/5 p-4 rounded-2xl text-slate-300 shadow-inner flex flex-col gap-2">
+                      <div className="flex items-center gap-2 text-indigo-400/80 font-bold uppercase tracking-widest text-[10px]">
+                        {(!msg.content && orbState === 'thinking') ? <Loader2 className="animate-spin" size={12} /> : <BrainCircuit size={12} />}
+                        Reasoning Process
+                      </div>
+                      <div className="whitespace-pre-wrap leading-relaxed opacity-70 text-[12px] italic">
+                        {msg.thoughts || 'Evaluating Sales Scenarios...'}
+                      </div>
                     </div>
                   </div>
                 )}
 
-                {/* Speech UI */}
-                {(!msg.thoughts || msg.content) && (
+                {/* Main Speech Bubble */}
+                {(msg.role === 'user' || msg.content) && (
                   <div className={`
-                      p-4 rounded-2xl shadow-lg leading-relaxed text-[15px]
+                      p-5 rounded-2xl shadow-xl leading-relaxed text-[15px]
                       ${msg.role === 'user' 
                         ? 'bg-gradient-to-br from-indigo-500 to-indigo-800 text-white rounded-br-sm' 
                         : 'bg-white/5 border border-white/10 text-slate-200 rounded-bl-sm'}
                   `}>
                     {msg.content ? (
-                      <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-black/50 prose-pre:border prose-pre:border-white/10">
+                      <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-black/50 prose-pre:border prose-pre:border-white/10 prose-headings:text-indigo-300">
                         <ReactMarkdown>{msg.content}</ReactMarkdown>
                       </div>
                     ) : (
-                      msg.role === 'avatar' && orbState !== 'idle' ? <Loader2 className="animate-spin text-indigo-400" size={20} /> : ''
+                      msg.role === 'avatar' && (orbState === 'thinking' || orbState === 'speaking') ? 
+                        <div className="flex gap-1.5 items-center py-2">
+                           <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"></div>
+                           <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+                           <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+                        </div> : ''
                     )}
                   </div>
                 )}
