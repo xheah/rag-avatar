@@ -10,6 +10,8 @@ export default {
         'float': 'float 6s ease-in-out infinite',
         'pulse-fast': 'pulse-fast 1s ease-in-out infinite',
         'wave': 'wave 1.5s ease-in-out infinite',
+        'pulse-slow': 'pulse-slow 2.5s ease-in-out infinite',
+        'ping-slow': 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
       },
       keyframes: {
         float: {
@@ -26,7 +28,11 @@ export default {
           '50%': { borderRadius: '50%', transform: 'rotate(180deg)' },
           '75%': { borderRadius: '55% 45% 55% 45%', transform: 'rotate(270deg)' },
           '100%': { borderRadius: '50%', transform: 'rotate(360deg)' },
-        }
+        },
+        'pulse-slow': {
+          '0%, 100%': { transform: 'scale(1)', opacity: '0.7' },
+          '50%': { transform: 'scale(1.08)', opacity: '1' },
+        },
       }
     },
   },

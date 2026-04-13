@@ -3,7 +3,7 @@ import os
 import json
 import asyncio
 import websockets
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, StreamingResponse
 from pydantic import BaseModel
@@ -51,6 +51,9 @@ class DualAgentTelemetry(BaseModel):
 
 pcs = set()
 
+# Per-session cancellation events for barge-in interrupts
+cancel_events: Dict[str, asyncio.Event] = {}
+
 @app.on_event("startup")
 async def startup_event():
     print("==================================================")
@@ -61,6 +64,26 @@ async def startup_event():
     get_embedding_model() # Trigger the lazy load here
     print("System Ready!")
     print("==================================================\n")
+
+@app.websocket("/ws/control")
+async def control_socket(ws: WebSocket, session_id: str = Query(default="react_user")):
+    """Control channel for barge-in interrupts and turn lifecycle signals."""
+    await ws.accept()
+    if session_id not in cancel_events:
+        cancel_events[session_id] = asyncio.Event()
+    print(f"[Control WS] Connected for session={session_id}")
+    try:
+        while True:
+            data = await ws.receive_text()
+            msg = json.loads(data)
+            if msg.get("type") == "barge_in":
+                print(f"[BARGE-IN] Interrupting session={session_id}")
+                cancel_events[session_id].set()
+            elif msg.get("type") == "turn_start":
+                print(f"[TURN-START] Resetting cancel event for session={session_id}")
+                cancel_events[session_id].clear()
+    except WebSocketDisconnect:
+        print(f"[Control WS] Disconnected for session={session_id}")
 
 @app.post("/api/telemetry")
 async def receive_telemetry(data: DualAgentTelemetry):
@@ -91,11 +114,17 @@ async def get_index():
     with open(os.path.join(BASE_DIR, "static", "index.html"), "r") as f:
         return f.read()
 
-async def chat_stream_generator(user_query: str, session_id: str):
+async def chat_stream_generator(user_query: str, session_id: str):  # noqa: C901
     import time
     import uuid
     import asyncio
     t0 = time.perf_counter()
+
+    # Get or create a cancel event for this session and reset it for this turn
+    if session_id not in cancel_events:
+        cancel_events[session_id] = asyncio.Event()
+    cancel_event = cancel_events[session_id]
+    cancel_event.clear()
 
     if session_id not in sessions:
         sessions[session_id] = ""
@@ -149,6 +178,17 @@ async def chat_stream_generator(user_query: str, session_id: str):
             # Start Cartesia receiver
             receiver_task = asyncio.create_task(cartesia_receiver()) if cartesia_ws else None
 
+            async def cancel_watcher():
+                """Closes Cartesia WS immediately when a barge-in fires."""
+                await cancel_event.wait()
+                if cartesia_ws and not cartesia_ws.closed:
+                    try:
+                        await cartesia_ws.close()
+                    except Exception:
+                        pass
+
+            watcher_task = asyncio.create_task(cancel_watcher()) if cartesia_ws else None
+
             # Tag-aware speech streaming state
             is_in_speech = False
             speech_parser_buffer = "" # Accumulates raw chunks to find tags
@@ -163,6 +203,10 @@ async def chat_stream_generator(user_query: str, session_id: str):
             llm_stream = generate_rag_response_v4_stream(user_query=user_query, retrieved_documents=retrieved, chat_history=chat_history)
             
             async for chunk in llm_stream:
+                # Barge-in: abort generation immediately
+                if cancel_event.is_set():
+                    print(f"[CANCELLED] LLM stream aborted for session={session_id}")
+                    break
                 if timestamps["t_first_token"] is None:
                     timestamps["t_first_token"] = time.perf_counter()
                 
@@ -250,12 +294,18 @@ async def chat_stream_generator(user_query: str, session_id: str):
                     "continue": False
                 }
                 try:
-                    await cartesia_ws.send(json.dumps(req))
-                    await asyncio.wait_for(receiver_task, timeout=30.0)
+                    if not cancel_event.is_set():
+                        await cartesia_ws.send(json.dumps(req))
+                        await asyncio.wait_for(receiver_task, timeout=30.0)
                 except Exception as ce:
-                     pass
+                    pass
                 finally:
-                    await cartesia_ws.close()
+                    if watcher_task:
+                        watcher_task.cancel()
+                    try:
+                        await cartesia_ws.close()
+                    except Exception:
+                        pass
 
             # Save chat history
             sessions[session_id] += f"User: {user_query}\nAvatar: {full_response}\n"
