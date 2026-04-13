@@ -294,7 +294,7 @@ async def process_audio_track(track, channel):
         return
 
     # Deepgram URL for streaming
-    DEEPGRAM_URL = 'wss://api.deepgram.com/v1/listen?encoding=linear16&sample_rate=16000&channels=1&smart_format=true&interim_results=true&endpointing=500'
+    DEEPGRAM_URL = 'wss://api.deepgram.com/v1/listen?model=nova-3&encoding=linear16&sample_rate=16000&channels=1&smart_format=true&interim_results=true&endpointing=500'
     
     resampler = av.AudioResampler(
         format='s16',
