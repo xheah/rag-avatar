@@ -12,7 +12,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE_DIR, "avatar_rag_db") # Pointing to the root DB folder
 
 # The Groq model to use for all LLM calls.
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "llama-3.3-70b-versatile"  
 
 # Create global singletons so they only load ONCE
 _DB_CLIENT = None
