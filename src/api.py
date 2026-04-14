@@ -160,6 +160,10 @@ async def chat_stream_generator(user_query: str, session_id: str):  # noqa: C901
             async def cartesia_receiver():
                 if not cartesia_ws:
                     return
+                # Track which text segment we are currently receiving audio for.
+                # Each time a 'timestamps' message arrives it signals the end of
+                # the audio for one text segment, so we bump the index.
+                recv_seg = {'idx': 0}
                 try:
                     async for msg in cartesia_ws:
                         if type(msg) == str:
@@ -169,7 +173,16 @@ async def chat_stream_generator(user_query: str, session_id: str):  # noqa: C901
                             elif data.get("type") == "chunk" and "data" in data:
                                 if timestamps["t_first_audio"] is None:
                                     timestamps["t_first_audio"] = time.perf_counter()
-                                await output_queue.put(f"data: {json.dumps({'type': 'audio_chunk', 'content': data['data']})}\n\n")
+                                await output_queue.put(
+                                    f"data: {json.dumps({'type': 'audio_chunk', 'content': data['data'], 'seg': recv_seg['idx']})}\n\n"
+                                )
+                            elif data.get("type") == "timestamps" and "word_timestamps" in data:
+                                wt = data["word_timestamps"]
+                                await output_queue.put(
+                                    f"data: {json.dumps({'type': 'word_timestamps', 'content': wt, 'seg': recv_seg['idx']})}\n\n"
+                                )
+                                # Timestamps mark the end of this segment's audio stream
+                                recv_seg['idx'] += 1
                             elif data.get("type") == "error":
                                 print(f"Cartesia Error: {data.get('error')}")
                 except Exception as e:
@@ -262,6 +275,7 @@ async def chat_stream_generator(user_query: str, session_id: str):  # noqa: C901
                                 "encoding": "pcm_f32le",
                                 "sample_rate": 44100
                             },
+                            "add_timestamps": True,
                             "continue": True
                         }
                         try:
@@ -291,6 +305,7 @@ async def chat_stream_generator(user_query: str, session_id: str):  # noqa: C901
                         "encoding": "pcm_f32le",
                         "sample_rate": 44100
                     },
+                    "add_timestamps": True,
                     "continue": False
                 }
                 try:
