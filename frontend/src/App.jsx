@@ -264,7 +264,18 @@ function App() {
   const initVAD = useCallback(async () => {
     await destroyVAD();
     const { MicVAD } = await import('@ricky0123/vad-web');
+
+    // Tell ONNX where to find the WebAssembly files
+    if (window.ort && window.ort.env && window.ort.env.wasm) {
+      window.ort.env.wasm.wasmPaths = '/';
+    }
+
     const vad = await MicVAD.new({
+      workletURL: '/vad.worklet.bundle.min.js',
+      modelURL: '/silero_vad_v5.onnx',
+      positiveSpeechThreshold: 0.8,
+      negativeSpeechThreshold: 0.3,
+      redemptionFrames: 8,
       onSpeechStart: () => {
         if (!voiceModeRef.current) return;
         if (isSpeakingRef.current) {
