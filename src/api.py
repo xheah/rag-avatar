@@ -346,7 +346,7 @@ async def chat_stream_generator(user_query: str, session_id: str):  # noqa: C901
         yield msg
 
 
-async def process_audio_track(track, channel):
+async def process_audio_track(track, get_channel):
     """
     Receives audio frames from the WebRTC track, resamples them to 16kHz 16-bit PCM,
     and sends them to Deepgram. Forwards Deepgram responses back through the data channel.
@@ -359,7 +359,7 @@ async def process_audio_track(track, channel):
         return
 
     # Deepgram URL for streaming
-    DEEPGRAM_URL = 'wss://api.deepgram.com/v1/listen?model=nova-3&encoding=linear16&sample_rate=16000&channels=1&smart_format=true&interim_results=true&endpointing=500'
+    DEEPGRAM_URL = 'wss://api.deepgram.com/v1/listen?model=nova-2&encoding=linear16&sample_rate=16000&channels=1&smart_format=true&interim_results=true&endpointing=500'
     
     resampler = av.AudioResampler(
         format='s16',
@@ -377,6 +377,7 @@ async def process_audio_track(track, channel):
                 try:
                     while True:
                         result = await dg_socket.recv()
+                        channel = get_channel()
                         if channel and channel.readyState == "open":
                             channel.send(result)
                 except Exception as e:
@@ -416,10 +417,9 @@ async def offer(params: Offer):
     def on_track(track):
         if track.kind == "audio":
             print("Audio track received via WebRTC")
-            # We wait a tiny bit to ensure data_channel is ready if it was created by client
             async def start_processing():
-                await asyncio.sleep(1) # Simple buffer for channel setup
-                await process_audio_track(track, data_channel)
+                # Removed artificial 1 second delay to ensure instant recording
+                await process_audio_track(track, lambda: data_channel)
             
             asyncio.create_task(start_processing())
 

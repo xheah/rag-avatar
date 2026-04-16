@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { 
-  Send, 
-  Trash2, 
-  Loader2, 
-  BrainCircuit, 
-  Mic, 
-  MicOff 
+import {
+  Send,
+  Trash2,
+  Loader2,
+  BrainCircuit,
+  Mic,
+  MicOff
 } from 'lucide-react';
 import Markdown from 'react-markdown';
-import { CartoonAvatar } from './components/CartoonAvatar';
+import { CartoonAvatar, PhotorealisticAvatar } from './components/CartoonAvatar';
 import { wordToVisemes } from './avatarUtils';
 
 const SESSION_ID = 'react_user';
@@ -42,6 +42,7 @@ function App() {
   const animFrameRef = useRef(null);
   const segStartTimesRef = useRef({});
   const lastSegIdxRef = useRef(null);
+  const speakingTimeoutRef = useRef(null);
 
   // ─── Formatting ───────────────────────────────────────────────────────────
   useEffect(() => {
@@ -51,8 +52,9 @@ function App() {
   // ─── Helper Functions ─────────────────────────────────────────────────────
 
   const interruptAudio = useCallback(() => {
+    if (speakingTimeoutRef.current) clearTimeout(speakingTimeoutRef.current);
     if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-      try { audioContextRef.current.close(); } catch (_) {}
+      try { audioContextRef.current.close(); } catch (_) { }
     }
     audioContextRef.current = null;
     nextStartTimeRef.current = 0;
@@ -126,7 +128,7 @@ function App() {
             if (payload.type === 'chunk') {
               currentRaw += payload.content;
               let parsedContent = '', parsedThoughts = null;
-              
+
               const thoughtMatch = currentRaw.match(/<thought>([\s\S]*?)<\/thought>/i) || currentRaw.match(/<thought>([\s\S]*)$/i);
               const speechMatch = currentRaw.match(/<speech>([\s\S]*?)<\/speech>/i) || currentRaw.match(/<speech>([\s\S]*)$/i);
 
@@ -194,10 +196,20 @@ function App() {
         }
       }
 
-      setTimeout(() => {
+      if (speakingTimeoutRef.current) clearTimeout(speakingTimeoutRef.current);
+
+      let waitTime = 1000;
+      if (audioContextRef.current) {
+        const remainingTime = nextStartTimeRef.current - audioContextRef.current.currentTime;
+        if (remainingTime > 0) {
+          waitTime = (remainingTime * 1000) + 500; // Add 500ms safety buffer
+        }
+      }
+
+      speakingTimeoutRef.current = setTimeout(() => {
         isSpeakingRef.current = false;
         setOrbState(voiceModeRef.current ? 'listening' : 'idle');
-      }, 1000);
+      }, waitTime);
 
     } catch (error) {
       console.error('Chat error', error);
@@ -206,7 +218,7 @@ function App() {
     }
   }, [inputValue, orbState, stopListening]);
 
-  const startListening = useCallback(async () => {
+  const startWebRTC = useCallback(async () => {
     stopListening();
     transcriptRef.current = '';
     setInputValue('');
@@ -230,14 +242,16 @@ function App() {
           if (received.speech_final) {
             const finalStr = transcriptRef.current.trim();
             if (finalStr.length > 0) {
-              stopListening();
+              transcriptRef.current = '';
               controlWsRef.current?.send(JSON.stringify({ type: 'turn_start' }));
               handleSend(finalStr);
             }
           }
         }
       };
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: { echoCancellation: true, noiseSuppression: true } 
+      });
       stream.getTracks().forEach(t => pc.addTrack(t, stream));
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
@@ -256,7 +270,7 @@ function App() {
 
   const destroyVAD = useCallback(async () => {
     if (vadRef.current) {
-      try { vadRef.current.pause(); await vadRef.current.destroy?.(); } catch (_) {}
+      try { vadRef.current.pause(); await vadRef.current.destroy?.(); } catch (_) { }
       vadRef.current = null;
     }
   }, []);
@@ -283,23 +297,25 @@ function App() {
           controlWsRef.current?.send(JSON.stringify({ type: 'barge_in' }));
         }
         setOrbState('listening');
-        startListening();
+        transcriptRef.current = '';
+        setInputValue('');
       },
       onSpeechEnd: () => {
         if (!voiceModeRef.current) return;
-        setOrbState('thinking');
+        // Deepgram speech_final handles the true end of turn and sends to LLM.
       },
     });
     vadRef.current = vad;
     vad.start();
     setOrbState('listening');
-  }, [destroyVAD, interruptAudio, startListening]);
+  }, [destroyVAD, interruptAudio]);
 
   const toggleVoiceMode = useCallback(async () => {
     const next = !voiceModeRef.current;
     voiceModeRef.current = next;
     setVoiceModeActive(next);
     if (next) {
+      startWebRTC();
       await initVAD();
     } else {
       await destroyVAD();
@@ -307,7 +323,7 @@ function App() {
       interruptAudio();
       setOrbState('idle');
     }
-  }, [initVAD, destroyVAD, stopListening, interruptAudio]);
+  }, [startWebRTC, initVAD, destroyVAD, stopListening, interruptAudio]);
 
   const driveVisemes = useCallback(() => {
     if (!audioContextRef.current) return;
@@ -354,7 +370,7 @@ function App() {
         body: JSON.stringify({ message: '', session_id: SESSION_ID }),
       });
       setMessages([{ role: 'avatar', content: 'Chat history cleared.', thoughts: null }]);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   // ─── Render ───────────────────────────────────────────────────────────────
@@ -369,7 +385,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-indigo-950 text-slate-50 flex justify-center items-center p-4 font-sans">
       <div className="flex flex-col md:flex-row w-full max-w-6xl h-[90vh] bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl overflow-hidden">
-        
+
         {/* Avatar Panel */}
         <div className="flex-1 flex flex-col justify-center items-center border-b md:border-b-0 md:border-r border-white/5 relative overflow-hidden gap-4 py-8">
           <div className="absolute inset-0 bg-indigo-500/10 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
@@ -377,12 +393,11 @@ function App() {
             <div className={`w-4 h-4 rounded-full mb-1 transition-all duration-300 ${miniOrbClass}`} />
             <div className="uppercase tracking-widest text-[10px] font-semibold text-slate-400 mb-3">{statusLabel}</div>
           </div>
-          <div className="z-10"><CartoonAvatar viseme={activeViseme} orbState={orbState} /></div>
+          <div className="z-10"><PhotorealisticAvatar viseme={activeViseme} orbState={orbState} /></div>
           <button
             onClick={toggleVoiceMode}
-            className={`z-10 relative flex flex-col items-center gap-2 px-8 py-3 rounded-2xl mt-4 font-semibold text-sm tracking-wide transition-all border ${
-              voiceModeActive ? 'bg-indigo-500/20 border-indigo-400/60 text-indigo-200' : 'bg-white/5 border-white/10 text-slate-400'
-            }`}
+            className={`z-10 relative flex flex-col items-center gap-2 px-8 py-3 rounded-2xl mt-4 font-semibold text-sm tracking-wide transition-all border ${voiceModeActive ? 'bg-indigo-500/20 border-indigo-400/60 text-indigo-200' : 'bg-white/5 border-white/10 text-slate-400'
+              }`}
           >
             <div className="flex items-center gap-3">{voiceModeActive ? <><Mic size={20} /><span>Active</span></> : <><MicOff size={20} /><span>Voice Mode</span></>}</div>
           </button>
@@ -418,9 +433,9 @@ function App() {
             <div ref={chatEndRef} />
           </div>
           <div className="mt-4 flex gap-3 bg-black/20 p-2 pl-4 rounded-full border border-white/5">
-            <input 
-              type="text" className="flex-1 bg-transparent border-none outline-none text-white placeholder-slate-400" 
-              placeholder="Type here..." value={inputValue} onChange={e => setInputValue(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} 
+            <input
+              type="text" className="flex-1 bg-transparent border-none outline-none text-white placeholder-slate-400"
+              placeholder="Type here..." value={inputValue} onChange={e => setInputValue(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()}
             />
             <button onClick={() => handleSend()} className="p-2 text-indigo-400 hover:bg-white/5 rounded-full"><Send size={18} /></button>
           </div>
