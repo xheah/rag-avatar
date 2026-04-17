@@ -75,7 +75,11 @@ async def control_socket(ws: WebSocket, session_id: str = Query(default="react_u
     try:
         while True:
             data = await ws.receive_text()
-            msg = json.loads(data)
+            try:
+                msg = json.loads(data)
+            except json.JSONDecodeError:
+                print(f"[Control WS] Ignored malformed JSON from session={session_id}")
+                continue
             if msg.get("type") == "barge_in":
                 print(f"[BARGE-IN] Interrupting session={session_id}")
                 cancel_events[session_id].set()
