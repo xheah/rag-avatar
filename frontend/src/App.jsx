@@ -43,11 +43,18 @@ function App() {
   const segStartTimesRef = useRef({});
   const lastSegIdxRef = useRef(null);
   const speakingTimeoutRef = useRef(null);
+  // ─── Barge-in control refs ─────────────────────────────────────────────────
+  const isBusyRef = useRef(false);      // synchronous guard against double-sends
+  const orbStateRef = useRef('idle');   // mirror of orbState for sync reads inside VAD callbacks
+  const streamGenRef = useRef(0);       // incremented per response stream; stale audio chunks are discarded
 
   // ─── Formatting ───────────────────────────────────────────────────────────
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Keep orbStateRef in sync so VAD callbacks can read state synchronously
+  useEffect(() => { orbStateRef.current = orbState; }, [orbState]);
 
   // ─── Helper Functions ─────────────────────────────────────────────────────
 
@@ -75,7 +82,13 @@ function App() {
 
   const handleSend = useCallback(async (autoMessage = null) => {
     const text = typeof autoMessage === 'string' ? autoMessage : inputValue.trim();
-    if (!text || orbState === 'thinking' || orbState === 'speaking') return;
+    // Fix #1: use a ref-based guard so the check is always synchronous.
+    // The old orbState check was stale inside async closures.
+    if (!text || isBusyRef.current) return;
+    isBusyRef.current = true;
+    // Fix #5: stamp this stream so stale audio chunks from a cancelled
+    // response can be detected and discarded.
+    const myGen = ++streamGenRef.current;
 
     if (!voiceModeRef.current) stopListening();
 
@@ -151,6 +164,8 @@ function App() {
               });
 
             } else if (payload.type === 'audio_chunk') {
+              // Fix #5: discard chunks that belong to a cancelled stream
+              if (streamGenRef.current !== myGen) continue;
               isSpeakingRef.current = true;
               const b64 = payload.content;
               const bin = atob(b64);
@@ -172,6 +187,7 @@ function App() {
               nextStartTimeRef.current = startTime + audioBuf.duration;
 
             } else if (payload.type === 'word_timestamps') {
+              if (streamGenRef.current !== myGen) continue;
               const { words, start, end } = payload.content;
               const seg = payload.seg ?? lastSegIdxRef.current ?? 0;
               const baseTime = segStartTimesRef.current[seg] ?? audioCtx.currentTime;
@@ -208,15 +224,17 @@ function App() {
 
       speakingTimeoutRef.current = setTimeout(() => {
         isSpeakingRef.current = false;
+        isBusyRef.current = false; // Fix #1: release the lock when audio finishes
         setOrbState(voiceModeRef.current ? 'listening' : 'idle');
       }, waitTime);
 
     } catch (error) {
       console.error('Chat error', error);
       isSpeakingRef.current = false;
+      isBusyRef.current = false; // Fix #1: release the lock on error
       setOrbState(voiceModeRef.current ? 'listening' : 'idle');
     }
-  }, [inputValue, orbState, stopListening]);
+  }, [inputValue, stopListening]); // orbState removed: guard now uses isBusyRef
 
   const startWebRTC = useCallback(async () => {
     stopListening();
@@ -243,7 +261,10 @@ function App() {
             const finalStr = transcriptRef.current.trim();
             if (finalStr.length > 0) {
               transcriptRef.current = '';
-              controlWsRef.current?.send(JSON.stringify({ type: 'turn_start' }));
+              // Fix #2: 'turn_start' was sent immediately after 'barge_in', creating a
+              // race where the server cleared cancel_event before the old LLM loop
+              // could check it. The cancel_event is now cleared only inside
+              // chat_stream_generator at the start of the new request.
               handleSend(finalStr);
             }
           }
@@ -292,8 +313,14 @@ function App() {
       redemptionFrames: 8,
       onSpeechStart: () => {
         if (!voiceModeRef.current) return;
-        if (isSpeakingRef.current) {
+        // Fix #3: isSpeakingRef can be false at the very start of speech onset
+        // (before the first audio_chunk sets it). Use orbStateRef for a synchronous
+        // read of the current UI state as a broader fallback.
+        const currentState = orbStateRef.current;
+        if (isSpeakingRef.current || currentState === 'speaking' || currentState === 'thinking') {
           interruptAudio();
+          // Fix #1: release the busy lock so the barge-in can trigger handleSend
+          isBusyRef.current = false;
           controlWsRef.current?.send(JSON.stringify({ type: 'barge_in' }));
         }
         setOrbState('listening');

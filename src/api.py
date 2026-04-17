@@ -339,10 +339,20 @@ async def chat_stream_generator(user_query: str, session_id: str):  # noqa: C901
     # Start orchestrator logic
     orchestrator_task = asyncio.create_task(orchestrate())
 
+    # Fix #4: Before yielding each SSE message, check if a barge-in has fired.
+    # Audio chunks that were already queued before Cartesia was closed must be
+    # discarded so the client does not receive and schedule stale audio playback.
     while True:
         msg = await output_queue.get()
         if msg is None:
             break
+        if cancel_event.is_set():
+            try:
+                payload_str = msg[6:].strip()   # strip leading "data: "
+                if payload_str and json.loads(payload_str).get('type') == 'audio_chunk':
+                    continue  # silently drop buffered audio chunk
+            except Exception:
+                pass
         yield msg
 
 
