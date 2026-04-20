@@ -96,6 +96,32 @@ def text_page(text_browser: Browser) -> Page:
     context.close()
 
 
+@pytest.fixture(scope="function")
+def barge_in_page(text_browser: Browser) -> Page:
+    """
+    Like text_page but with a WebSocket interceptor pre-installed so that
+    every WS instance is recorded on window.__controlWsInstances.
+    This allows inject_barge_in() to send over the control socket without
+    relying on page.reload() or accumulating add_init_script calls.
+    """
+    _WS_INTERCEPT_SCRIPT = """
+        window.__controlWsInstances = [];
+        const _OrigWS = window.WebSocket;
+        window.WebSocket = function(...args) {
+            const ws = new _OrigWS(...args);
+            window.__controlWsInstances.push(ws);
+            return ws;
+        };
+        Object.assign(window.WebSocket, _OrigWS);
+    """
+    context: BrowserContext = text_browser.new_context(permissions=["microphone"])
+    page: Page = context.new_page()
+    page.add_init_script(_WS_INTERCEPT_SCRIPT)
+    page.goto(FRONTEND_URL, wait_until="domcontentloaded", timeout=15_000)
+    yield page
+    context.close()
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Voice-mode browser (fake WAV injected as microphone)
 # Used for barge-in / VAD triggered tests.
