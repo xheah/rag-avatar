@@ -24,7 +24,7 @@ import { wordToVisemes } from '../avatarUtils.js';
 // ─── Helper ────────────────────────────────────────────────────────────────
 
 /** All valid viseme IDs produced by the function. */
-const VALID_VISEMES = new Set(['IDLE', 'MBPV', 'AH', 'EE', 'OO', 'TH', 'SH', 'TSN']);
+const VALID_VISEMES = new Set(['IDLE', 'MBPV', 'FV', 'AH', 'EE', 'OO', 'TH', 'SH', 'TSN']);
 
 function assertValidVisemes(arr) {
   expect(Array.isArray(arr)).toBe(true);
@@ -97,8 +97,8 @@ describe('wordToVisemes — digraphs', () => {
     expect(wordToVisemes('zh')[0]).toBe('SH');
   });
 
-  it('"ph" → MBPV (bilabial)', () => {
-    expect(wordToVisemes('ph')[0]).toBe('MBPV');
+  it('"ph" → FV (labiodental)', () => {
+    expect(wordToVisemes('ph')[0]).toBe('FV');
   });
 
   it('"wh" → OO', () => {
@@ -158,9 +158,16 @@ describe('wordToVisemes — digraphs', () => {
 
 describe('wordToVisemes — single characters', () => {
   // Bilabials → MBPV
-  ['b', 'p', 'm', 'f', 'v'].forEach(c => {
+  ['b', 'p', 'm'].forEach(c => {
     it(`"${c}" → MBPV`, () => {
       expect(wordToVisemes(c)).toContain('MBPV');
+    });
+  });
+
+  // Labiodentals → FV
+  ['f', 'v'].forEach(c => {
+    it(`"${c}" → FV`, () => {
+      expect(wordToVisemes(c)).toContain('FV');
     });
   });
 

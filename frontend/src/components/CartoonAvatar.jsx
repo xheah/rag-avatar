@@ -197,44 +197,83 @@ export function LifelikeAvatar({ viseme = 'IDLE', orbState = 'idle' }) {
   );
 }
 
-// Phase 2B Photorealistic / Seamless Sprite-Sheet Avatar
-// Uses a 1-row, 11-frame sprite sheet arrayed horizontally.
-// By shifting backgroundPosition, the browser instantly swaps the mouth without decoding overhead.
-const VISEME_INDEX = {
+// Phase 3 — Frame-Based Avatar with Blink State Machine
+// Uses a 9-column × 4-row WebP sprite sheet.
+//   Columns = mouth shapes (driven by TTS visemes)
+//   Rows    = eye states   (driven by useBlinkMachine)
+// By shifting backgroundPosition in 2D, the browser instantly swaps both
+// the mouth and eye state without any decoding overhead.
+
+import { useEffect } from 'react';
+
+/** Mouth column mapping — 9 viseme IDs → column index (0-8). */
+const MOUTH_COL = {
   IDLE: 0,
   MBPV: 1,
   AH:   2,
   EE:   3,
-  OO:   4,
-  TH:   5,
-  SH:   6,
-  TSN:  7,
-  TRANS_HALF_OPEN: 8,
-  TRANS_WIDE_OPEN: 9,
-  TRANS_PUCKER:    10,
+  TSN:  4,
+  OO:   5,
+  TH:   6,
+  SH:   7,
+  FV:   8,
 };
 
-export function PhotorealisticAvatar({ viseme = 'IDLE', orbState = 'idle' }) {
-  const frameIndex = VISEME_INDEX[viseme] ?? 0;
-  
-  // X-offset percentage calculation. For 11 frames, the increments are 100/10 = 10%
-  // 0 -> 0%, 1 -> 10%, ... 10 -> 100%
-  const xOffset = frameIndex * 10;
+/** Eye row mapping — 4 eye states → row index (0-3). */
+const EYE_ROW = {
+  O:  0,  // Open
+  HA: 1,  // Half-Opened
+  HC: 2,  // Half-Closed
+  C:  3,  // Closed
+};
+
+const NUM_COLS = 9;
+const NUM_ROWS = 4;
+const SPRITESHEET_URL = '/nathan_avatar_spritesheet.webp';
+
+// Source frame dimensions — used to compute correct aspect ratio
+const FRAME_W = 1080;
+const FRAME_H = 1920;
+const CONTAINER_SIZE = 380;
+
+// Each cell's rendered dimensions when width fills the container
+const CELL_W = CONTAINER_SIZE; // 380px
+const CELL_H = CONTAINER_SIZE * (FRAME_H / FRAME_W); // ≈ 676px (preserves 9:16)
+
+// Shift upward from dead-center to show more of the face/head area
+const Y_CENTER_OFFSET = (CELL_H - CONTAINER_SIZE) * 0.35;
+
+export function PhotorealisticAvatar({ viseme = 'IDLE', eyeState = 'O', orbState = 'idle' }) {
+  const col = MOUTH_COL[viseme] ?? 0;
+  const row = EYE_ROW[eyeState] ?? 0;
+
+  // Pixel-based positioning:
+  //   x: slide to the correct column
+  //   y: slide to the correct row, then center vertically within the viewport
+  const xPos = -(col * CELL_W);
+  const yPos = -(row * CELL_H + Y_CENTER_OFFSET);
 
   // Scale pulse animation when speaking to give slight life breathing
   const transformClass = orbState === 'speaking' ? 'scale-[1.01]' : 'scale-100';
 
+  // Preload the sprite sheet on mount to prevent flicker on first blink
+  useEffect(() => {
+    const img = new Image();
+    img.src = SPRITESHEET_URL;
+  }, []);
+
   return (
-    <div className={`relative w-[280px] h-[280px] rounded-full overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)] border-4 border-indigo-500/30 transition-transform duration-100 ease-in-out ${transformClass}`}>
+    <div className={`relative w-[380px] h-[380px] rounded-full overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)] border-4 border-indigo-500/30 transition-transform duration-100 ease-in-out ${transformClass}`}>
       <div 
         className="w-full h-full"
         style={{
-          // Scale image width to hold exactly 11 frames (1100% width)
-          backgroundImage: `url('/avatar_strip_v2.png')`,
-          backgroundSize: '1100% 100%', 
-          backgroundPosition: `${xOffset}% 0%`,
+          backgroundImage: `url('${SPRITESHEET_URL}')`,
+          // Width = NUM_COLS * container width; height auto-scales to preserve aspect ratio
+          backgroundSize: `${NUM_COLS * CONTAINER_SIZE}px auto`,
+          backgroundPosition: `${xPos}px ${yPos}px`,
           backgroundRepeat: 'no-repeat',
-          // No CSS transition here. We want exact snappiness.
+          // No CSS transition on background-position — we want exact snappiness
+          // to avoid ghosting between frames.
         }}
       />
     </div>

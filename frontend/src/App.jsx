@@ -10,6 +10,7 @@ import {
 import Markdown from 'react-markdown';
 import { CartoonAvatar, PhotorealisticAvatar } from './components/CartoonAvatar';
 import { wordToVisemes } from './avatarUtils';
+import { useBlinkMachine } from './useBlinkMachine';
 
 const SESSION_ID = 'react_user';
 
@@ -26,6 +27,7 @@ function App() {
   const [orbState, setOrbState] = useState('idle');
   const [activeViseme, setActiveViseme] = useState('IDLE');
   const [voiceModeActive, setVoiceModeActive] = useState(false);
+  const eyeState = useBlinkMachine();
 
   // ─── Refs ─────────────────────────────────────────────────────────────────
   const audioContextRef = useRef(null);
@@ -420,7 +422,7 @@ function App() {
             <div className={`w-4 h-4 rounded-full mb-1 transition-all duration-300 ${miniOrbClass}`} />
             <div className="uppercase tracking-widest text-[10px] font-semibold text-slate-400 mb-3">{statusLabel}</div>
           </div>
-          <div className="z-10"><PhotorealisticAvatar viseme={activeViseme} orbState={orbState} /></div>
+          <div className="z-10"><PhotorealisticAvatar viseme={activeViseme} eyeState={eyeState} orbState={orbState} /></div>
           <button
             onClick={toggleVoiceMode}
             className={`z-10 relative flex flex-col items-center gap-2 px-8 py-3 rounded-2xl mt-4 font-semibold text-sm tracking-wide transition-all border ${voiceModeActive ? 'bg-indigo-500/20 border-indigo-400/60 text-indigo-200' : 'bg-white/5 border-white/10 text-slate-400'

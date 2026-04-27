@@ -57,9 +57,14 @@ vi.mock('react-markdown', () => ({
 // 4. Avatar components — lightweight stubs
 vi.mock('../components/CartoonAvatar', () => ({
   CartoonAvatar: () => <div data-testid="cartoon-avatar" />,
-  PhotorealisticAvatar: ({ viseme, orbState }) => (
-    <div data-testid="photo-avatar" data-viseme={viseme} data-orb={orbState} />
+  PhotorealisticAvatar: ({ viseme, eyeState, orbState }) => (
+    <div data-testid="photo-avatar" data-viseme={viseme} data-eye={eyeState} data-orb={orbState} />
   ),
+}));
+
+// 4b. Blink state machine — return constant 'O' (eyes open) to avoid timers in tests
+vi.mock('../useBlinkMachine', () => ({
+  useBlinkMachine: () => 'O',
 }));
 
 // 5. Browser APIs unavailable in jsdom

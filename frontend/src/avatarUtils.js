@@ -8,7 +8,8 @@
  *
  * Viseme set (8 shapes):
  *   IDLE  – rest / closed mouth
- *   MBPV  – bilabial closure  (m, b, p, f, v, ph)
+ *   MBPV  – bilabial closure  (m, b, p)
+ *   FV    – labiodental       (f, v, ph)
  *   AH    – wide open         (a, ah, aw, au)
  *   EE    – spread smile      (e, i, ee, ea, ai, ay)
  *   OO    – rounded pucker    (o, u, oo, ou, ow, w)
@@ -37,7 +38,7 @@ export function wordToVisemes(word) {
     if (di === 'sh')   { visemes.push('SH');   i += 2; continue; }
     if (di === 'ch')   { visemes.push('SH');   i += 2; continue; }
     if (di === 'zh')   { visemes.push('SH');   i += 2; continue; }
-    if (di === 'ph')   { visemes.push('MBPV'); i += 2; continue; }
+    if (di === 'ph')   { visemes.push('FV');   i += 2; continue; }
     if (di === 'wh')   { visemes.push('OO');   i += 2; continue; }
     if (di === 'ng')   { visemes.push('TSN');  i += 2; continue; }
     if (di === 'ee')   { visemes.push('EE');   i += 2; continue; }
@@ -54,8 +55,10 @@ export function wordToVisemes(word) {
     switch (c) {
       // Bilabials
       case 'b': case 'p': case 'm':
-      case 'f': case 'v':
         visemes.push('MBPV'); break;
+      // Labiodentals
+      case 'f': case 'v':
+        visemes.push('FV'); break;
       // Wide-open vowel
       case 'a':
         visemes.push('AH'); break;
