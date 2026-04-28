@@ -14,6 +14,9 @@ DB_PATH = os.path.join(BASE_DIR, "avatar_rag_db") # Pointing to the root DB fold
 # The Groq model to use for all LLM calls.
 GROQ_MODEL = "llama-3.3-70b-versatile"  
 
+CARTESIA_VOICE_ID = os.getenv("CARTESIA_VOICE_ID", "5ee9feff-1265-424a-9d7f-8e4d431a12c7")
+SALES_SCENARIOS_COLLECTION = "collection_sales_scenarios"
+
 # Create global singletons so they only load ONCE
 _DB_CLIENT = None
 _LLM_CLIENT = None

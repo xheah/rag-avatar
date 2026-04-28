@@ -1,8 +1,5 @@
-from src.config import get_db_client, get_embedding_model
+from src.config import get_db_client, get_embedding_model, SALES_SCENARIOS_COLLECTION
 
-def get_closest_match(user_query: str):
-    """Old implementation. Use get_closest_matches instead."""
-    pass
 
 def get_closest_matches(user_query: str, k=5):
     """Queries the fine-tuned ChromaDB collection for the k most relevant documents."""
@@ -13,7 +10,7 @@ def get_closest_matches(user_query: str, k=5):
     
     # 2. Get DB Client and collection
     db_client = get_db_client()
-    collection = db_client.get_or_create_collection(name="collection_sales_scenarios")
+    collection = db_client.get_or_create_collection(name=SALES_SCENARIOS_COLLECTION)
     
     # 3. Query
     result = collection.query(query_embeddings=[embeddings], n_results=k)
