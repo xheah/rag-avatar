@@ -192,7 +192,7 @@ function App() {
               if (streamGenRef.current !== myGen) continue;
               const { phonemes, start, end } = payload.content;
               const seg = payload.seg ?? lastSegIdxRef.current ?? 0;
-              const baseTime = segStartTimesRef.current[seg] ?? audioCtx.currentTime;
+              const baseTime = segStartTimesRef.current[0] ?? audioCtx.currentTime;
 
               phonemes.forEach((phoneme, pi) => {
                 const pAbsStart = baseTime + start[pi];
