@@ -180,10 +180,10 @@ async def chat_stream_generator(user_query: str, session_id: str):  # noqa: C901
                                 await output_queue.put(
                                     f"data: {json.dumps({'type': 'audio_chunk', 'content': data['data'], 'seg': recv_seg['idx']})}\n\n"
                                 )
-                            elif data.get("type") == "timestamps" and "word_timestamps" in data:
-                                wt = data["word_timestamps"]
+                            elif data.get("type") == "phoneme_timestamps" and "phoneme_timestamps" in data:
+                                pt = data["phoneme_timestamps"]
                                 await output_queue.put(
-                                    f"data: {json.dumps({'type': 'word_timestamps', 'content': wt, 'seg': recv_seg['idx']})}\n\n"
+                                    f"data: {json.dumps({'type': 'phoneme_timestamps', 'content': pt, 'seg': recv_seg['idx']})}\n\n"
                                 )
                                 # Timestamps mark the end of this segment's audio stream
                                 recv_seg['idx'] += 1
@@ -279,7 +279,7 @@ async def chat_stream_generator(user_query: str, session_id: str):  # noqa: C901
                                 "encoding": "pcm_f32le",
                                 "sample_rate": 44100
                             },
-                            "add_timestamps": True,
+                            "add_phoneme_timestamps": True,
                             "continue": True
                         }
                         try:
@@ -309,7 +309,7 @@ async def chat_stream_generator(user_query: str, session_id: str):  # noqa: C901
                         "encoding": "pcm_f32le",
                         "sample_rate": 44100
                     },
-                    "add_timestamps": True,
+                    "add_phoneme_timestamps": True,
                     "continue": False
                 }
                 try:
