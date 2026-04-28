@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { CartoonAvatar, PhotorealisticAvatar } from './components/CartoonAvatar';
-import { wordToVisemes } from './avatarUtils';
+import { ipaToViseme } from './avatarUtils';
 import { useBlinkMachine } from './useBlinkMachine';
 
 const SESSION_ID = 'react_user';
@@ -188,20 +188,18 @@ function App() {
               lastSegIdxRef.current = seg;
               nextStartTimeRef.current = startTime + audioBuf.duration;
 
-            } else if (payload.type === 'word_timestamps') {
+            } else if (payload.type === 'phoneme_timestamps') {
               if (streamGenRef.current !== myGen) continue;
-              const { words, start, end } = payload.content;
+              const { phonemes, start, end } = payload.content;
               const seg = payload.seg ?? lastSegIdxRef.current ?? 0;
               const baseTime = segStartTimesRef.current[seg] ?? audioCtx.currentTime;
 
-              words.forEach((word, wi) => {
-                const wordAbsStart = baseTime + start[wi];
-                const wordDuration = end[wi] - start[wi];
-                const visemes = wordToVisemes(word);
-                const timePerVis = wordDuration / Math.max(visemes.length, 1);
-                visemes.forEach((viseme, vi) => {
-                  visemeQueueRef.current.push({ viseme, absoluteTime: wordAbsStart + vi * timePerVis });
-                });
+              phonemes.forEach((phoneme, pi) => {
+                const pAbsStart = baseTime + start[pi];
+                const viseme = ipaToViseme(phoneme);
+                // To avoid jitter, only push if it's different from the last viseme at exactly the same time,
+                // but actually the queue will just process them.
+                visemeQueueRef.current.push({ viseme, absoluteTime: pAbsStart });
               });
               visemeQueueRef.current.sort((a, b) => a.absoluteTime - b.absoluteTime);
 

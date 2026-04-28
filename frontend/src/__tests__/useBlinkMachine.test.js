@@ -71,16 +71,16 @@ describe('useBlinkMachine — blink cycle (step-by-step)', () => {
     act(() => { vi.advanceTimersByTime(1); });
     expect(result.current).toBe('HC');
 
-    // Step 3: HC → C after 60ms
-    act(() => { vi.advanceTimersByTime(60); });
+    // Step 3: HC → C after 30ms
+    act(() => { vi.advanceTimersByTime(30); });
     expect(result.current).toBe('C');
 
-    // Step 4: C → HA after 40ms
-    act(() => { vi.advanceTimersByTime(40); });
+    // Step 4: C → HA after 30ms
+    act(() => { vi.advanceTimersByTime(30); });
     expect(result.current).toBe('HA');
 
-    // Step 5: HA → O after 60ms
-    act(() => { vi.advanceTimersByTime(60); });
+    // Step 5: HA → O after 30ms
+    act(() => { vi.advanceTimersByTime(30); });
     expect(result.current).toBe('O');
 
     Math.random.mockRestore();
@@ -99,11 +99,11 @@ describe('useBlinkMachine — blink cycle (step-by-step)', () => {
       // Advance to exact trigger point
       act(() => { vi.advanceTimersByTime(4000); });
       observedStates.add(result.current);
-      act(() => { vi.advanceTimersByTime(60); });
+      act(() => { vi.advanceTimersByTime(30); });
       observedStates.add(result.current);
-      act(() => { vi.advanceTimersByTime(40); });
+      act(() => { vi.advanceTimersByTime(30); });
       observedStates.add(result.current);
-      act(() => { vi.advanceTimersByTime(60); });
+      act(() => { vi.advanceTimersByTime(30); });
       observedStates.add(result.current);
     }
 
@@ -172,15 +172,15 @@ describe('useBlinkMachine — double-blink', () => {
     expect(result.current).toBe('HC');
 
     // Complete the first blink cycle step by step
-    act(() => { vi.advanceTimersByTime(60); });  // HC → C
+    act(() => { vi.advanceTimersByTime(30); });  // HC → C
     expect(result.current).toBe('C');
-    act(() => { vi.advanceTimersByTime(40); });  // C → HA
+    act(() => { vi.advanceTimersByTime(30); });  // C → HA
     expect(result.current).toBe('HA');
-    act(() => { vi.advanceTimersByTime(60); });  // HA → O
+    act(() => { vi.advanceTimersByTime(30); });  // HA → O
     expect(result.current).toBe('O');
 
-    // Double-blink triggers after 80ms pause
-    act(() => { vi.advanceTimersByTime(80); });
+    // Double-blink triggers after 20ms pause
+    act(() => { vi.advanceTimersByTime(20); });
     expect(result.current).toBe('HC'); // Second blink started!
 
     Math.random.mockRestore();

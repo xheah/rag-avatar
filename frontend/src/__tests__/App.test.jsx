@@ -447,10 +447,10 @@ describe('App — message accumulation', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 // 7. avatarUtils integration — wordToVisemes imported via App
 // ─────────────────────────────────────────────────────────────────────────────
-describe('App — wordToVisemes integration (via import)', () => {
+describe('App — ipaToViseme integration (via import)', () => {
   it('avatarUtils is importable from the same module graph as App', async () => {
-    const { wordToVisemes } = await import('../avatarUtils.js');
+    const { ipaToViseme } = await import('../avatarUtils.js');
     // Spot-check a known result to confirm the module loaded correctly
-    expect(wordToVisemes('hello')).toContain('IDLE'); // 'h' → IDLE
+    expect(ipaToViseme('m')).toBe('MBPV'); 
   });
 });
