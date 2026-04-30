@@ -214,3 +214,4 @@ models/
 /data/langchain_research.md
 /data/report.md
 .antigravity
+avatar_rag_db/
