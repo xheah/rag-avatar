@@ -5,12 +5,17 @@ import {
   Loader2,
   BrainCircuit,
   Mic,
-  MicOff
+  MicOff,
+  MessageSquare,
+  X
 } from 'lucide-react';
 import Markdown from 'react-markdown';
-import { CartoonAvatar, PhotorealisticAvatar } from './components/CartoonAvatar';
+import { PhotorealisticAvatar } from './components/CartoonAvatar';
+import { SubtitleCaption } from './components/SubtitleCaption';
+import { ChatHistoryPanel } from './components/ChatHistoryPanel';
 import { ipaToViseme } from './avatarUtils';
 import { useBlinkMachine } from './useBlinkMachine';
+import './App.css';
 
 const SESSION_ID = 'react_user';
 
@@ -27,6 +32,10 @@ function App() {
   const [orbState, setOrbState] = useState('idle');
   const [activeViseme, setActiveViseme] = useState('IDLE');
   const [voiceModeActive, setVoiceModeActive] = useState(false);
+  const [chatPanelOpen, setChatPanelOpen] = useState(false);
+  const [currentCaption, setCurrentCaption] = useState(
+    "Welcome back. I am your Sales Tutor. Ready for your next scenario?"
+  );
   const eyeState = useBlinkMachine();
 
   // ─── Refs ─────────────────────────────────────────────────────────────────
@@ -38,7 +47,6 @@ function App() {
   const transcriptRef = useRef('');
   const vadRef = useRef(null);
   const controlWsRef = useRef(null);
-  const chatEndRef = useRef(null);
   const voiceModeRef = useRef(false);
   const visemeQueueRef = useRef([]);
   const animFrameRef = useRef(null);
@@ -49,11 +57,6 @@ function App() {
   const isBusyRef = useRef(false);      // synchronous guard against double-sends
   const orbStateRef = useRef('idle');   // mirror of orbState for sync reads inside VAD callbacks
   const streamGenRef = useRef(0);       // incremented per response stream; stale audio chunks are discarded
-
-  // ─── Formatting ───────────────────────────────────────────────────────────
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   // Keep orbStateRef in sync so VAD callbacks can read state synchronously
   useEffect(() => { orbStateRef.current = orbState; }, [orbState]);
@@ -98,6 +101,7 @@ function App() {
     setInputValue('');
     transcriptRef.current = '';
     setOrbState('thinking');
+    setCurrentCaption('');
 
     visemeQueueRef.current = [];
     segStartTimesRef.current = {};
@@ -156,6 +160,11 @@ function App() {
                 parsedContent = currentRaw;
               }
 
+              // Update caption with the current speech content
+              if (parsedContent) {
+                setCurrentCaption(parsedContent);
+              }
+
               setMessages(prev => {
                 const arr = [...prev];
                 const target = arr[arr.length - 1];
@@ -197,8 +206,6 @@ function App() {
               phonemes.forEach((phoneme, pi) => {
                 const pAbsStart = baseTime + start[pi];
                 const viseme = ipaToViseme(phoneme);
-                // To avoid jitter, only push if it's different from the last viseme at exactly the same time,
-                // but actually the queue will just process them.
                 visemeQueueRef.current.push({ viseme, absoluteTime: pAbsStart });
               });
               visemeQueueRef.current.sort((a, b) => a.absoluteTime - b.absoluteTime);
@@ -270,8 +277,8 @@ function App() {
           }
         }
       };
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: { echoCancellation: true, noiseSuppression: true } 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true }
       });
       stream.getTracks().forEach(t => pc.addTrack(t, stream));
       const offer = await pc.createOffer();
@@ -397,77 +404,84 @@ function App() {
         body: JSON.stringify({ message: '', session_id: SESSION_ID }),
       });
       setMessages([{ role: 'avatar', content: 'Chat history cleared.', thoughts: null }]);
+      setCurrentCaption('Chat history cleared.');
     } catch (e) { }
   };
 
   // ─── Render ───────────────────────────────────────────────────────────────
-  const statusLabel = { idle: 'Online', listening: 'Listening…', thinking: 'Analyzing…', speaking: 'Speaking…' }[orbState];
-  const miniOrbClass = {
-    idle: 'bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.8)]',
-    listening: 'bg-indigo-400 shadow-[0_0_12px_rgba(99,102,241,1)] animate-pulse',
-    thinking: 'bg-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.9)] animate-pulse',
-    speaking: 'bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.9)]',
+  const statusLabel = {
+    idle: 'Online',
+    listening: 'Listening…',
+    thinking: 'Analyzing…',
+    speaking: 'Speaking…'
   }[orbState];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-indigo-950 text-slate-50 flex justify-center items-center p-4 font-sans">
-      <div className="flex flex-col md:flex-row w-full max-w-6xl h-[90vh] bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl overflow-hidden">
+    <div className="avatar-stage">
+      {/* ── Top Bar ─────────────────────────────────────────── */}
+      <div className="top-bar">
+        <button
+          onClick={toggleVoiceMode}
+          className={`voice-mode-btn ${voiceModeActive ? 'active' : ''}`}
+        >
+          {voiceModeActive ? <Mic size={16} /> : <MicOff size={16} />}
+          <span>{voiceModeActive ? 'Voice Active' : 'Voice Mode'}</span>
+        </button>
 
-        {/* Avatar Panel */}
-        <div className="flex-1 flex flex-col justify-center items-center border-b md:border-b-0 md:border-r border-white/5 relative overflow-hidden gap-4 py-8">
-          <div className="absolute inset-0 bg-indigo-500/10 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
-          <div className="z-10 flex flex-col items-center">
-            <div className={`w-4 h-4 rounded-full mb-1 transition-all duration-300 ${miniOrbClass}`} />
-            <div className="uppercase tracking-widest text-[10px] font-semibold text-slate-400 mb-3">{statusLabel}</div>
-          </div>
-          <div className="z-10"><PhotorealisticAvatar viseme={activeViseme} eyeState={eyeState} orbState={orbState} /></div>
+        <button
+          onClick={() => setChatPanelOpen(prev => !prev)}
+          className={`chat-history-btn ${chatPanelOpen ? 'active' : ''}`}
+        >
+          <MessageSquare size={16} />
+          <span>Chat History</span>
+        </button>
+      </div>
+
+      {/* ── Avatar Center ───────────────────────────────────── */}
+      <div className="avatar-center">
+        <div className="status-indicator">
+          <div className={`status-dot ${orbState}`} />
+          <div className="status-label">{statusLabel}</div>
+        </div>
+
+        <PhotorealisticAvatar
+          viseme={activeViseme}
+          eyeState={eyeState}
+          orbState={orbState}
+        />
+
+        {/* ── Subtitle Caption ────────────────────────────────── */}
+        <SubtitleCaption text={currentCaption} orbState={orbState} />
+      </div>
+
+      {/* ── Bottom Input Bar ────────────────────────────────── */}
+      <div className="input-bar-container">
+        <div className="input-bar">
+          <input
+            type="text"
+            className="input-field"
+            placeholder="Type your message..."
+            value={inputValue}
+            onChange={e => setInputValue(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSend()}
+          />
           <button
-            onClick={toggleVoiceMode}
-            className={`z-10 relative flex flex-col items-center gap-2 px-8 py-3 rounded-2xl mt-4 font-semibold text-sm tracking-wide transition-all border ${voiceModeActive ? 'bg-indigo-500/20 border-indigo-400/60 text-indigo-200' : 'bg-white/5 border-white/10 text-slate-400'
-              }`}
+            onClick={() => handleSend()}
+            className="input-send-btn"
+            title="Send message"
           >
-            <div className="flex items-center gap-3">{voiceModeActive ? <><Mic size={20} /><span>Active</span></> : <><MicOff size={20} /><span>Voice Mode</span></>}</div>
+            <Send size={16} />
           </button>
         </div>
-
-        {/* Chat Panel */}
-        <div className="flex-[1.5] flex flex-col p-6 relative">
-          <div className="flex justify-end mb-4"><button onClick={handleClear} className="text-rose-300 hover:text-white text-xs flex items-center gap-1"><Trash2 size={14} /> Clear</button></div>
-          <div className="flex-1 overflow-y-auto flex flex-col gap-6 pr-3 pb-4">
-            {messages.map((msg, idx) => (
-              <div key={idx} className={`flex max-w-[85%] flex-col gap-2 ${msg.role === 'user' ? 'self-end' : 'self-start'}`}>
-                {msg.role === 'avatar' && msg.thoughts && (
-                  <div className="text-xs font-mono bg-black/40 border border-white/5 p-4 rounded-2xl text-slate-300">
-                    <div className="text-indigo-400 font-bold mb-1 uppercase tracking-tighter text-[10px]">Strategic Analysis</div>
-                    <div className="opacity-70 italic">{msg.thoughts}</div>
-                  </div>
-                )}
-                <div className={`p-5 rounded-2xl shadow-xl leading-relaxed text-[15px] ${msg.role === 'user' ? 'bg-indigo-600 text-white' : 'bg-white/10 border border-white/10 text-slate-200'}`}>
-                  {msg.content ? (
-                    <div className="prose prose-invert max-w-none">
-                      <Markdown>{msg.content}</Markdown>
-                    </div>
-                  ) : msg.role === 'avatar' && (
-                    <div className="flex gap-2 items-center py-2">
-                      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" />
-                      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.2s]" />
-                      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.4s]" />
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-            <div ref={chatEndRef} />
-          </div>
-          <div className="mt-4 flex gap-3 bg-black/20 p-2 pl-4 rounded-full border border-white/5">
-            <input
-              type="text" className="flex-1 bg-transparent border-none outline-none text-white placeholder-slate-400"
-              placeholder="Type here..." value={inputValue} onChange={e => setInputValue(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()}
-            />
-            <button onClick={() => handleSend()} className="p-2 text-indigo-400 hover:bg-white/5 rounded-full"><Send size={18} /></button>
-          </div>
-        </div>
       </div>
+
+      {/* ── Chat History Panel ──────────────────────────────── */}
+      <ChatHistoryPanel
+        isOpen={chatPanelOpen}
+        onClose={() => setChatPanelOpen(false)}
+        messages={messages}
+        onClear={handleClear}
+      />
     </div>
   );
 }
