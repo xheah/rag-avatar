@@ -6,13 +6,11 @@ import {
   BrainCircuit,
   Mic,
   MicOff,
-  MessageSquare,
-  X
+  Sparkles,
+  Bot
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { PhotorealisticAvatar } from './components/CartoonAvatar';
-import { SubtitleCaption } from './components/SubtitleCaption';
-import { ChatHistoryPanel } from './components/ChatHistoryPanel';
 import { ipaToViseme } from './avatarUtils';
 import { useBlinkMachine } from './useBlinkMachine';
 import './App.css';
@@ -32,10 +30,6 @@ function App() {
   const [orbState, setOrbState] = useState('idle');
   const [activeViseme, setActiveViseme] = useState('IDLE');
   const [voiceModeActive, setVoiceModeActive] = useState(false);
-  const [chatPanelOpen, setChatPanelOpen] = useState(false);
-  const [currentCaption, setCurrentCaption] = useState(
-    "Welcome back. I am your Sales Tutor. Ready for your next scenario?"
-  );
   const eyeState = useBlinkMachine();
 
   // ─── Refs ─────────────────────────────────────────────────────────────────
@@ -101,7 +95,6 @@ function App() {
     setInputValue('');
     transcriptRef.current = '';
     setOrbState('thinking');
-    setCurrentCaption('');
 
     visemeQueueRef.current = [];
     segStartTimesRef.current = {};
@@ -158,11 +151,6 @@ function App() {
               } else if (!currentRaw.includes('<thought>')) {
                 setOrbState('speaking');
                 parsedContent = currentRaw;
-              }
-
-              // Update caption with the current speech content
-              if (parsedContent) {
-                setCurrentCaption(parsedContent);
               }
 
               setMessages(prev => {
@@ -362,6 +350,8 @@ function App() {
   const driveVisemes = useCallback(() => {
     if (!audioContextRef.current) return;
     const now = audioContextRef.current.currentTime;
+    
+    // Viseme Sync
     const queue = visemeQueueRef.current;
     while (queue.length > 0 && queue[0].absoluteTime <= now) {
       setActiveViseme(queue.shift().viseme);
@@ -369,6 +359,7 @@ function App() {
     if (queue.length === 0 && !isSpeakingRef.current) {
       setActiveViseme('IDLE');
     }
+
     animFrameRef.current = requestAnimationFrame(driveVisemes);
   }, []);
 
@@ -404,84 +395,129 @@ function App() {
         body: JSON.stringify({ message: '', session_id: SESSION_ID }),
       });
       setMessages([{ role: 'avatar', content: 'Chat history cleared.', thoughts: null }]);
-      setCurrentCaption('Chat history cleared.');
     } catch (e) { }
   };
 
   // ─── Render ───────────────────────────────────────────────────────────────
   const statusLabel = {
-    idle: 'Online',
-    listening: 'Listening…',
-    thinking: 'Analyzing…',
-    speaking: 'Speaking…'
+    idle: 'System Online',
+    listening: 'Listening to you...',
+    thinking: 'Analyzing input...',
+    speaking: 'Avatar Speaking...'
+  }[orbState];
+  
+  const statusColor = {
+    idle: 'bg-indigo-500 shadow-indigo-500/50',
+    listening: 'bg-indigo-400 shadow-indigo-400/80 animate-pulse',
+    thinking: 'bg-rose-500 shadow-rose-500/80 animate-pulse',
+    speaking: 'bg-emerald-500 shadow-emerald-500/80'
   }[orbState];
 
   return (
-    <div className="avatar-stage">
-      {/* ── Top Bar ─────────────────────────────────────────── */}
-      <div className="top-bar">
-        <button
-          onClick={toggleVoiceMode}
-          className={`voice-mode-btn ${voiceModeActive ? 'active' : ''}`}
-        >
-          {voiceModeActive ? <Mic size={16} /> : <MicOff size={16} />}
-          <span>{voiceModeActive ? 'Voice Active' : 'Voice Mode'}</span>
-        </button>
+    <div className="min-h-screen bg-[#0a0f1c] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0a0f1c] to-[#0a0f1c] text-slate-100 font-sans flex items-center justify-center p-4 sm:p-8">
+      <div className="w-full max-w-7xl h-[85vh] bg-slate-900/40 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] shadow-[0_0_80px_rgba(79,70,229,0.15)] flex flex-col lg:flex-row overflow-hidden relative">
+        
+        {/* Left: Avatar Panel */}
+        <div className="flex-1 lg:flex-[0.8] border-b lg:border-b-0 lg:border-r border-white/5 relative flex flex-col items-center justify-center p-8 bg-gradient-to-b from-indigo-500/5 to-transparent">
+          <div className="absolute top-8 left-8 flex items-center gap-3">
+            <div className={`w-3 h-3 rounded-full shadow-lg transition-colors duration-300 ${statusColor}`} />
+            <span className="text-xs font-semibold uppercase tracking-widest text-slate-400">{statusLabel}</span>
+          </div>
 
-        <button
-          onClick={() => setChatPanelOpen(prev => !prev)}
-          className={`chat-history-btn ${chatPanelOpen ? 'active' : ''}`}
-        >
-          <MessageSquare size={16} />
-          <span>Chat History</span>
-        </button>
-      </div>
+          <div className="relative w-full max-w-[320px] aspect-square flex items-center justify-center">
+            {/* Ambient glow */}
+            <div className={`absolute inset-0 rounded-full blur-3xl opacity-20 transition-colors duration-1000 ${statusColor}`} />
+            <PhotorealisticAvatar viseme={activeViseme} eyeState={eyeState} orbState={orbState} />
+          </div>
 
-      {/* ── Avatar Center ───────────────────────────────────── */}
-      <div className="avatar-center">
-        <div className="status-indicator">
-          <div className={`status-dot ${orbState}`} />
-          <div className="status-label">{statusLabel}</div>
-        </div>
-
-        <PhotorealisticAvatar
-          viseme={activeViseme}
-          eyeState={eyeState}
-          orbState={orbState}
-        />
-
-        {/* ── Subtitle Caption ────────────────────────────────── */}
-        <SubtitleCaption text={currentCaption} orbState={orbState} />
-      </div>
-
-      {/* ── Bottom Input Bar ────────────────────────────────── */}
-      <div className="input-bar-container">
-        <div className="input-bar">
-          <input
-            type="text"
-            className="input-field"
-            placeholder="Type your message..."
-            value={inputValue}
-            onChange={e => setInputValue(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSend()}
-          />
           <button
-            onClick={() => handleSend()}
-            className="input-send-btn"
-            title="Send message"
+            onClick={toggleVoiceMode}
+            className={`mt-12 px-8 py-4 rounded-2xl flex items-center gap-3 font-semibold text-sm transition-all duration-300 backdrop-blur-md border ${
+              voiceModeActive 
+                ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-200 hover:bg-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.2)]' 
+                : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-slate-200'
+            }`}
           >
-            <Send size={16} />
+            {voiceModeActive ? <Mic size={18} /> : <MicOff size={18} />}
+            {voiceModeActive ? 'Voice Mode Active' : 'Enable Voice Mode'}
           </button>
         </div>
-      </div>
 
-      {/* ── Chat History Panel ──────────────────────────────── */}
-      <ChatHistoryPanel
-        isOpen={chatPanelOpen}
-        onClose={() => setChatPanelOpen(false)}
-        messages={messages}
-        onClear={handleClear}
-      />
+        {/* Right: Chat Panel */}
+        <div className="flex-[1.2] flex flex-col relative bg-black/20">
+          {/* Chat Header */}
+          <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-sm z-10">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-indigo-500/20 rounded-lg border border-indigo-500/20 text-indigo-400">
+                <Bot size={20} />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-slate-100 leading-tight">Sales Tutor</h2>
+                <p className="text-xs text-slate-400">Interactive Training Session</p>
+              </div>
+            </div>
+            <button onClick={handleClear} className="text-rose-400/70 hover:text-rose-400 transition-colors flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-xl hover:bg-rose-500/10">
+              <Trash2 size={16} />
+              Clear
+            </button>
+          </div>
+
+          {/* Chat Messages */}
+          <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-8 scroll-smooth">
+            {messages.map((msg, idx) => (
+              <div key={idx} className={`flex max-w-[85%] flex-col gap-2 ${msg.role === 'user' ? 'self-end' : 'self-start'}`}>
+                {msg.role === 'avatar' && msg.thoughts && (
+                  <div className="bg-black/40 backdrop-blur-md border border-white/5 rounded-2xl p-5 text-sm text-slate-300 font-mono shadow-inner">
+                    <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-2">
+                      <Sparkles size={14} /> Strategic Analysis
+                    </div>
+                    <div className="opacity-80 leading-relaxed">{msg.thoughts}</div>
+                  </div>
+                )}
+                <div className={`p-5 rounded-2xl shadow-lg leading-relaxed text-[15px] ${
+                  msg.role === 'user' 
+                    ? 'bg-indigo-600 text-white rounded-br-sm' 
+                    : 'bg-white/10 border border-white/10 text-slate-200 rounded-bl-sm backdrop-blur-md'
+                }`}>
+                  {msg.content ? (
+                    <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-black/50 prose-pre:border prose-pre:border-white/10">
+                      <Markdown>{msg.content}</Markdown>
+                    </div>
+                  ) : msg.role === 'avatar' && (
+                    <div className="flex gap-2 items-center py-2 px-1">
+                      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" />
+                      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.15s]" />
+                      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.3s]" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+            <div ref={(el) => el && el.scrollIntoView({ behavior: 'smooth' })} />
+          </div>
+
+          {/* Chat Input */}
+          <div className="p-6 bg-gradient-to-t from-black/40 to-transparent">
+            <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-2 flex items-center shadow-2xl focus-within:bg-white/10 focus-within:border-indigo-500/50 transition-all duration-300">
+              <input
+                type="text"
+                className="flex-1 bg-transparent border-none outline-none text-slate-100 placeholder-slate-500 px-4 py-2 font-light"
+                placeholder="Type your response..."
+                value={inputValue}
+                onChange={e => setInputValue(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSend()}
+              />
+              <button
+                onClick={() => handleSend()}
+                disabled={!inputValue.trim() || orbState === 'thinking'}
+                className="p-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg"
+              >
+                <Send size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

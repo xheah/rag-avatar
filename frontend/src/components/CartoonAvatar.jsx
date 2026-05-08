@@ -234,24 +234,30 @@ const SPRITESHEET_URL = '/nathan_avatar_spritesheet.webp';
 // Source frame dimensions — used to compute correct aspect ratio
 const FRAME_W = 1080;
 const FRAME_H = 1920;
-const CONTAINER_SIZE = 380;
+const CONTAINER_SIZE = 480;
 
-// Each cell's rendered dimensions when width fills the container
-const CELL_W = CONTAINER_SIZE; // 380px
-const CELL_H = CONTAINER_SIZE * (FRAME_H / FRAME_W); // ≈ 676px (preserves 9:16)
+// Zoom factor to crop into the face, making it larger and removing dead space
+const ZOOM = 0.5;
 
-// Shift upward from dead-center to show more of the face/head area
-const Y_CENTER_OFFSET = (CELL_H - CONTAINER_SIZE) * 0.35;
+// Each cell's rendered dimensions when scaled
+const CELL_W = CONTAINER_SIZE * ZOOM;
+const CELL_H = CELL_W * (FRAME_H / FRAME_W);
+
+// Calculate exact offsets to center the face within the cropped viewport
+// We shift the image left (positive X_OFFSET) to center the avatar, 
+// and use a 0.28 multiplier for Y to keep the head properly framed without cutting off the top.
+const X_OFFSET = -36; 
+const Y_OFFSET = (CELL_H - CONTAINER_SIZE) * -0.5;
 
 export function PhotorealisticAvatar({ viseme = 'IDLE', eyeState = 'O', orbState = 'idle' }) {
   const col = MOUTH_COL[viseme] ?? 0;
   const row = EYE_ROW[eyeState] ?? 0;
 
   // Pixel-based positioning:
-  //   x: slide to the correct column
-  //   y: slide to the correct row, then center vertically within the viewport
-  const xPos = -(col * CELL_W);
-  const yPos = -(row * CELL_H + Y_CENTER_OFFSET);
+  //   x: slide to the correct column, plus crop offset
+  //   y: slide to the correct row, plus crop offset
+  const xPos = -(col * CELL_W + X_OFFSET);
+  const yPos = -(row * CELL_H + Y_OFFSET);
 
   // Scale pulse animation when speaking to give slight life breathing
   const transformClass = orbState === 'speaking' ? 'scale-[1.01]' : 'scale-100';
@@ -263,17 +269,14 @@ export function PhotorealisticAvatar({ viseme = 'IDLE', eyeState = 'O', orbState
   }, []);
 
   return (
-    <div className={`relative w-[380px] h-[380px] rounded-full overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)] border-4 border-indigo-500/30 transition-transform duration-100 ease-in-out ${transformClass}`}>
+    <div className={`relative w-full h-full rounded-full overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)] border-4 border-indigo-500/30 transition-transform duration-100 ease-in-out ${transformClass}`}>
       <div 
-        className="w-full h-full"
+        className="absolute inset-0"
         style={{
           backgroundImage: `url('${SPRITESHEET_URL}')`,
-          // Width = NUM_COLS * container width; height auto-scales to preserve aspect ratio
-          backgroundSize: `${NUM_COLS * CONTAINER_SIZE}px auto`,
+          backgroundSize: `${NUM_COLS * CELL_W}px auto`,
           backgroundPosition: `${xPos}px ${yPos}px`,
           backgroundRepeat: 'no-repeat',
-          // No CSS transition on background-position — we want exact snappiness
-          // to avoid ghosting between frames.
         }}
       />
     </div>

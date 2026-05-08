@@ -289,6 +289,8 @@ async def chat_stream_generator(user_query: str, session_id: str):
             
             llm_stream = generate_rag_response_v4_stream(user_query=user_query, retrieved_documents=retrieved, chat_history=chat_history)
             
+            sent_seg_idx = 0
+            
             async for chunk in llm_stream:
                 if cancel_event.is_set():
                     print(f"[CANCELLED] LLM stream aborted for session={session_id}")
@@ -302,12 +304,16 @@ async def chat_stream_generator(user_query: str, session_id: str):
                 if tts.ws:
                     ready_text = parser.process_chunk(chunk)
                     if ready_text:
+                        await output_queue.put(f"data: {json.dumps({'type': 'word_mapping', 'seg': sent_seg_idx, 'word': ready_text})}\n\n")
                         await tts.send_text(ready_text, continue_flag=True)
+                        sent_seg_idx += 1
 
             timestamps["t_llm_done"] = time.perf_counter()
 
             if tts.ws:
                 final_text = parser.flush()
+                if final_text:
+                    await output_queue.put(f"data: {json.dumps({'type': 'word_mapping', 'seg': sent_seg_idx, 'word': final_text})}\n\n")
                 await tts.send_text(final_text, continue_flag=False)
                 await tts.close()
 

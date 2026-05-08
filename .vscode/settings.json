@@ -1,0 +1,9 @@
+{
+    "editor.snippetSuggestions": "none",
+    "editor.inlineSuggest.edits.showLongDistanceHint": false,
+    "editor.suggest.showFunctions": false,
+    "editor.suggest.showIcons": false,
+    "editor.acceptSuggestionOnCommitCharacter": false,
+    "editor.inlineSuggest.edits.renderSideBySide": "never",
+    "editor.inlineSuggest.enabled": false
+}
